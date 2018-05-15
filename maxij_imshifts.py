@@ -17,7 +17,7 @@ from datetime import datetime
 from multiprocessing import Pool
 
 #######
-night = '2018-03-28'
+night = '2018-05-05'
 ## path to the directory with the MAXIJ native-resolution fits files:
 pathnam = '/media/amanda/demeter/maxi_j1820_070/' + night + '/'
 scipathnam = pathnam + 'science/' #folder with science images
@@ -37,7 +37,7 @@ fnames = get_filelist_maxi(scipathnam)  # list of sorted filenames for sci image
 
 ##create & plot (to check) a 60s reference image
 ## should check this by-eye prior to beginning shifts & save it to
-zref = stack_maxi(scipathnam, 60, 120) #, fix_list)
+zref = stack_maxi(scipathnam,120,180) #, fix_list)
 write_to_fits(pathnam+'ref_stack.fits',zref)
 
 ## to show/save/check reference image:
