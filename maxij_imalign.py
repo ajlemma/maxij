@@ -11,9 +11,6 @@ by A Townsend
 
 from maxijdefs import *
 import pandas as pd
-# import numpy as np
-# import matplotlib.pyplot as plt
-# from scipy.signal import fftconvolve
 from scipy.ndimage.interpolation import shift
 from astropy.io import fits
 import time
@@ -49,7 +46,6 @@ n_tot = n2 - n1                 # total
 
 ## Parallelized version:
 def align_rebin(filename):
-    # i = 0
     # print filename
     im0 = fits.getdata(scipathnam+filename)
     im1 = shift(im0, (imshifts.loc[filename]["y"], imshifts.loc[filename]["x"]), mode='constant', cval=0.0)
@@ -61,7 +57,6 @@ p = Pool(7)
 print "shifting images..."
 # for img in fnames[n1:n2]:
 #     align_rebin(img)
-# p.imap_unordered(align_rebin,fnames[n1:n2],10)
 
 p.map(align_rebin,fnames[n1:n2],10)
 
