@@ -24,14 +24,14 @@ scipathnam = pathnam + 'science/' #folder with science images
 
 time0 = time.time()
 print "start: " + str(datetime.now())
-print "Processing data for " + night
+print "Processing images for " + night
 # ## list of bad pixels; this code is obsolete
 # ## however, as these pixels are saturated in EVERY image
 # ## it seems prudent to leave
 # fix_list = [[437, 916], [893, 353]]
 #
 
-print "getting list of filenames..."
+print "getting list of filenames from " + night + "science ..."
 fnames = get_filelist_maxi(scipathnam)  # list of sorted filenames for sci images in pathnam
 print "total science frames:  " + str(len(fnames))
 
@@ -40,7 +40,7 @@ print "total science frames:  " + str(len(fnames))
 print "stacking reference image..."
 zref = stack_maxi(scipathnam,1000, 1015) #, fix_list)
 write_to_fits(pathnam+'ref_stack.fits',zref)
-print "reference image is saved at " + pathnam + "ref_stack.fits"
+print "reference image is saved at " + night + "ref_stack.fits"
 
 ## to show/save/check reference image:
 # f1 = plt.figure()
@@ -98,7 +98,7 @@ def get_shifts(science_image):
 #         output = (a[0] + ' %f ' % a[1] + ' %f' % a[2] + ' %f' % a[3] + '\n')
 #         # print output
 #         f.write(output)
-# print "image shifts are saved at " + pathnam+'imshifts_'+night+'.txt'
+# print "image shifts are saved at " + night +'imshifts_'+night+'.txt'
 
 time1 = time.time()
 print "finish: " + str(datetime.now())
