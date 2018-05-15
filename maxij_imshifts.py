@@ -24,21 +24,23 @@ scipathnam = pathnam + 'science/' #folder with science images
 
 time0 = time.time()
 print "start: " + str(datetime.now())
-
+print "Processing data for " + night
 # ## list of bad pixels; this code is obsolete
 # ## however, as these pixels are saturated in EVERY image
 # ## it seems prudent to leave
 # fix_list = [[437, 916], [893, 353]]
 #
 
-
+print "getting list of filenames..."
 fnames = get_filelist_maxi(scipathnam)  # list of sorted filenames for sci images in pathnam
-# print len(fnames)
+print "total science frames:  " + str(len(fnames))
 
 ##create & plot (to check) a 60s reference image
 ## should check this by-eye prior to beginning shifts & save it to
-zref = stack_maxi(scipathnam,120,180) #, fix_list)
+print "stacking reference image..."
+zref = stack_maxi(scipathnam,1000, 1015) #, fix_list)
 write_to_fits(pathnam+'ref_stack.fits',zref)
+print "reference image is saved at " + pathnam + "ref_stack.fits"
 
 ## to show/save/check reference image:
 # f1 = plt.figure()
@@ -48,7 +50,8 @@ write_to_fits(pathnam+'ref_stack.fits',zref)
 # f1.savefig('zref'+night+'.png')
 
 
-## get rid of low-level wave information for reference image & cross-correlat it with itself:
+## get rid of low-level wave information for reference image & cross-correlate it with itself:
+print "getting correlation reference..."
 imref = zref
 imref[imref < 1e3] = 0
 corr_ref = fftconvolve(imref, imref[::-1, ::-1])  # cross-correlate them
@@ -81,6 +84,7 @@ def get_shifts(science_image):
     return (science_image, (correlation2.shape[0] / 2) - int(yc), (correlation2.shape[1] / 2) - int(xc), np.max(correlation2) / 1e10)  # required pixel shifts
 
 ## Non-parallelized shifts version:
+## print "calculating individual image shifts (non-parallelized)..."
 ## for i in range(n_tot):
 ##     a = get_shifts(scipathnam,fnames[i],fix_list,imref,corr_ref)
 ##     print ('%d ' % i + ' ' + fnames[i] + ' %f ' % a[0] + ' %f' % a[1] + ' %f' % a[2] + '\n')
@@ -88,11 +92,13 @@ def get_shifts(science_image):
 ## Parallelized version--still takes a bit over an hour on 6 processors,
 ## So consider carefully before uncommenting:
 # p = Pool(6)
+# print "calculating individual image shifts..."
 # with open(pathnam+'imshifts_'+night+'.txt','w') as f:
 #     for a in p.imap_unordered(get_shifts,fnames[n1:n2],25):
 #         output = (a[0] + ' %f ' % a[1] + ' %f' % a[2] + ' %f' % a[3] + '\n')
 #         # print output
 #         f.write(output)
+# print "image shifts are saved at " + pathnam+'imshifts_'+night+'.txt'
 
 time1 = time.time()
 print "finish: " + str(datetime.now())
