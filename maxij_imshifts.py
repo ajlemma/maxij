@@ -89,16 +89,16 @@ def get_shifts(science_image):
 ##     a = get_shifts(scipathnam,fnames[i],fix_list,imref,corr_ref)
 ##     print ('%d ' % i + ' ' + fnames[i] + ' %f ' % a[0] + ' %f' % a[1] + ' %f' % a[2] + '\n')
 
-## Parallelized version--still takes a bit over an hour on 6 processors,
-## So consider carefully before uncommenting:
-# p = Pool(6)
-# print "calculating individual image shifts..."
-# with open(pathnam+'imshifts_'+night+'.txt','w') as f:
-#     for a in p.imap_unordered(get_shifts,fnames[n1:n2],25):
-#         output = (a[0] + ' %f ' % a[1] + ' %f' % a[2] + ' %f' % a[3] + '\n')
-#         # print output
-#         f.write(output)
-# print "image shifts are saved at " + night +'imshifts_'+night+'.txt'
+# Parallelized version--still takes a bit over an hour on 6 processors,
+# So consider carefully before uncommenting:
+p = Pool(6)
+print "calculating individual image shifts..."
+with open(pathnam+'imshifts_'+night+'.txt','w') as f:
+    for a in p.imap_unordered(get_shifts,fnames[n1:n2],25):
+        output = (a[0] + ' %f ' % a[1] + ' %f' % a[2] + ' %f' % a[3] + '\n')
+        # print output
+        f.write(output)
+print "image shifts are saved at " + night +'imshifts_'+night+'.txt'
 
 time1 = time.time()
 print "finish: " + str(datetime.now())

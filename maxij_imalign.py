@@ -53,12 +53,12 @@ def align_rebin(filename):
     write_to_fits(apathnam + filename.split('.')[0]+'_aligned.' + filename.split('.')[1], im2)  # write to aligned subdir, add suffix "_aligned"
     return
 
-p = Pool(7)
+p = Pool(6)
 print "shifting images..."
 # for img in fnames[n1:n2]:
 #     align_rebin(img)
 
-p.map(align_rebin,fnames[n1:n2],10)
+p.map(align_rebin,fnames[n1:n2],25)
 
 print "Aligned & rebinned images are saved at " + night + '/aligned with the suffix "_aligned"'
 
