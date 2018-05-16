@@ -39,7 +39,7 @@ imshifts = pd.read_csv(pathnam + 'imshifts_' + night + '.txt',
                          delimiter=r"\s+")
 
 
-## first and last images to stack, and total no. of images
+## first and last images to shift & rebin, and total no. of images
 n1 = 0                          # first
 n2 = len(fnames)                # last
 n_tot = n2 - n1                 # total
