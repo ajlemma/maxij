@@ -1,5 +1,10 @@
 #######
 ''' maxij_imshifts.py
+
+code being split up & made into functions; see:
+maxij_makeref.py
+maxij_getshifts.py
+
 Original Code by S Eikenberry, modified by A Townsend
 1. make & save a 1-minute zref image (check this!!)
 2. cross correlate it with itself to get a reference baseline
