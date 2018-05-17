@@ -47,4 +47,4 @@ def get_sec(time_str):
 
 def parse_time(fname):
     ss = fname.find('-')
-    return get_sec(fname[ss - 2:ss + 6])
+    return fname[ss - 2:ss + 6]
