@@ -5,7 +5,8 @@ from glob import glob
 from os.path import basename
 from natsort import natsorted
 import numpy as np
-
+import time
+from datetime import datetime
 
 def write_to_fits(f_name, data):
     # writes file as fits
@@ -48,3 +49,13 @@ def get_sec(time_str):
 def parse_time(fname):
     ss = fname.find('-')
     return fname[ss - 2:ss + 6]
+
+def timestart():
+    print "start: " + str(datetime.now())
+    return time.time()
+
+def timefinish(t_initial):
+    t_now = time.time()
+    print "finish: " + str(datetime.now())
+    elapsed_time = t_now - t_initial
+    print "time elapsed: " + str(elapsed_time) + " s (" + str(elapsed_time / 60.) + " min)"
