@@ -1,8 +1,7 @@
 #######
 
-# from maxijdefs import *
 import pandas as pd
-# import numpy as np
+
 import matplotlib.pyplot as plt
 #######
 night = '2018-05-16'
