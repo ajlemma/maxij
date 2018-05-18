@@ -53,7 +53,6 @@ def savealigned(night, n1 = 0, n2 = 'max', path='/media/amanda/demeter/maxi_j182
     timefinish(time0)
 
 
-## Parallelized version:
 def align_rebin(filename,scipathnam,apathnam,imshifts):
     # print filename
     im0 = fits.getdata(scipathnam+filename)
