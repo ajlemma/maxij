@@ -26,7 +26,7 @@ def savealigned(night, n1 = 0, n2 = 'max', path='/media/amanda/demeter/maxi_j182
     scipathnam = pathnam + 'science/'  # folder with science images
     apathnam = pathnam + 'aligned/'  # folder for aligned images
 
-    print "getting list of filenames from " + night + "science ..."
+    print "getting list of filenames from " + night + "/science ..."
     fnames = get_filelist_maxi(scipathnam)  # list of sorted filenames for sci images in pathnam
     print "total science frames:  " + str(len(fnames))
 
@@ -46,7 +46,7 @@ def savealigned(night, n1 = 0, n2 = 'max', path='/media/amanda/demeter/maxi_j182
 
     p = Pool(6)
     print "shifting images..."
-    p.map(partial(align_rebin, scipathnam = scipathnam,apathnam = apathnam,imshifts = imshifts), fnames[n1:n2], 25)
+    p.map(partial(align_rebin, scipathnam = scipathnam,apathnam = apathnam,imshifts = imshifts), fnames[n1:n2],35)
 
     print "Aligned & rebinned images are saved at " + night + '/aligned with the suffix "_aligned"'
 
