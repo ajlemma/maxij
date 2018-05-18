@@ -1,7 +1,7 @@
 #######
 
 import pandas as pd
-
+from scipy.signal import fftconvolve
 import matplotlib.pyplot as plt
 #######
 night = '2018-05-16'
@@ -20,6 +20,11 @@ bright = led_df[led_df['ntp1min']>1000000]
 
 print led_df.iloc[0]
 
-tosave = led_df.filter(['filetime', 'filetime_s', 'os_time', 'led10s', 'ntp1min'], axis=1)
-print tosave[0:10]
-tosave.to_csv(pathnam+'ntp_data.txt',sep=' ')
+# tosave = led_df.filter(['filetime', 'filetime_s', 'os_time', 'led10s', 'ntp1min'], axis=1)
+# print tosave[0:10]
+# tosave.to_csv(pathnam+'ntp_data.txt',sep=' ')
+
+acorr = fftconvolve(led_df['ntp1min'],led_df['ntp1min'][::-1])
+
+plt.plot(acorr)
+plt.show()
