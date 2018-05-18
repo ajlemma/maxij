@@ -32,7 +32,7 @@ def makeref(night,im0=60,im1=120,path='/media/amanda/demeter/maxi_j1820_070/'):
     plt.imshow(zref,vmin=1e3,vmax=3e3)
     plt.colorbar()
     plt.show()
-    f1.savefig('zref'+night+'.png')
+    # f1.savefig('zref'+night+'.png')
 
     timefinish(time0)
 
