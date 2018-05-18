@@ -7,7 +7,7 @@ by A Townsend
 
 import pandas as pd
 from maxijdefs import *
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import time
 from datetime import datetime
 from multiprocessing import Pool
@@ -20,10 +20,7 @@ pathnam = '/media/amanda/demeter/maxi_j1820_070/' + night + '/'
 # scipathnam = pathnam + 'science/' #folder with science images
 apathnam = pathnam + 'aligned/' #folder for aligned images
 
-time0 = time.time()
-print "start: " + str(datetime.now())
-print "Processing images for " + night
-
+time0 = timestart()
 
 pathnam = '/media/amanda/demeter/maxi_j1820_070/' + night + '/'
 apathnam = pathnam + 'aligned/' #folder for aligned images
@@ -75,14 +72,14 @@ maxidat = {'fileID': fileID,
            }
 maxiframe = pd.DataFrame(maxidat, index=fileID)
 
-#parallelize this
+
 def assign_times(id):
     maxiframe.loc[id,'filetime'] = parse_time(maxiframe.loc[id,'filename'])
     maxiframe.loc[id,'filetime_s'] = get_sec(maxiframe.loc[id,'filetime'])
     maxiframe.loc[id,'os_time'] = ostime.loc[id,'epochtime(s)']
 
 p = Pool(6)
-p.map(assign_times,fnames,25)
+p.map(assign_times,fileID,25)
     # print ostime.loc[id,'epochtime(s)']
     # print maxiframe.loc[id,'os_time']
 # print maxiframe
@@ -90,3 +87,5 @@ p.map(assign_times,fnames,25)
 # plt.plot(maxiframe['fileID'],maxiframe['os_time'],'r.')
 # plt.plot(maxiframe['fileID'],maxiframe['filetime_s'],'b.')
 # plt.show()
+
+timefinish(time0)
