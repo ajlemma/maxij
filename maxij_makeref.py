@@ -37,4 +37,4 @@ def makeref(night,im0=60,im1=120,path='/media/amanda/demeter/maxi_j1820_070/'):
     timefinish(time0)
 
 if __name__ == "__main__":
-    makeref('2018-03-28')
+    makeref('test',im0=0,im1=9,path='./')
