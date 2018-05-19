@@ -8,9 +8,8 @@ by A Townsend
 import pandas as pd
 from maxijdefs import *
 # import matplotlib.pyplot as plt
-import time
-from datetime import datetime
 from multiprocessing import Pool
+from functools import partial
 
 #######
 night = '2018-03-28'
