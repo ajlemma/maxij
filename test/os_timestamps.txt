@@ -1,0 +1,12 @@
+# Starting epoch (local time): Wed Dec 31 19:00:00 1969
+# Filename                           Time since epoch (seconds)
+maxij_1s_0001 03-25-03.tiff	1522221903.04
+maxij_1s_0002 03-25-04.tiff	1522221904.12
+maxij_1s_0003 03-25-05.tiff	1522221905.2
+maxij_1s_0004 03-25-06.tiff	1522221906.28
+maxij_1s_0005 03-25-07.tiff	1522221907.36
+maxij_1s_0006 03-25-08.tiff	1522221908.44
+maxij_1s_0007 03-25-09.tiff	1522221909.53
+maxij_1s_0008 03-25-10.tiff	1522221910.61
+maxij_1s_0009 03-25-11.tiff	1522221911.69
+maxij_1s_0010 03-25-12.tiff	1522221912.77
