@@ -33,7 +33,7 @@ refstars = pd.read_csv(pathnam + 'ref_stars_xy.txt', delimiter=r"\s+")
 
 
 print "getting os timestamps..."
-ostime = pd.read_csv(pathnam + 'os_timestamps.txt',
+ostime = pd.read_csv(pathnam + 'timestamps_' + night + '.txt',
                      skiprows=2,
                      header=None,
                      names=['filename1','filename2','epochtime(s)'],
