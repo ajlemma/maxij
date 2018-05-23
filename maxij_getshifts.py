@@ -25,7 +25,7 @@ def getshifts(night, n1 = 0, n2 = 'max',path='/media/amanda/demeter/maxi_j1820_0
     pathnam = path+night+'/'
     scipathnam = pathnam + 'science/'  # folder with science images
 
-    print "getting list of filenames from " + night + "science ..."
+    print "getting list of filenames from " + night + "/science ..."
     fnames = get_filelist_maxi(scipathnam)  # list of sorted filenames for sci images in pathnam
     print "total science frames:  " + str(len(fnames))
 
@@ -78,4 +78,4 @@ def get_shifts(science_image,imref,corr_ref,scipathnam):
 
 
 if __name__ == "__main__":
-    getshifts('test', n2 = 10)
+    getshifts('test', n2 = 10, path = './')
