@@ -2,10 +2,11 @@ MAXI J1820+070 Reduction & Analysis Procedure
 
 1. Create master darks & flats (check by eye)
 2. dark-subtract & flat-divide raw images, & log bad pixels
-3. Create stacked reference image (60s consecutive data)--check by eye & save
+3. Create stacked reference image (15-60s consecutive data)--check by eye & save
 4. Determine image offsets via cross-correlation wrt reference image
-5. Shift & rebin images
-6. Open reference image in AIJ (or ds9)
+- add an 'aligned' folder to night folder
+5. Shift & rebin images, save in aligned folder
+6. Open an aligned image in AIJ (or ds9)
     - output list of x,y FITS pixel values of TYC, MAXIJ, & other reference stars
     - save a png image with objects labeled in order (to double-check)
 7. Photometer star positions (+/- shifts in TYC centroid on each image) & save data
