@@ -1,7 +1,7 @@
 #######
 ''' maxij_multiphot.py
 by A Townsend
-1.
+1. this code was never finished--now is maxij_initdb and maxij_dophot
 '''
 #######
 
