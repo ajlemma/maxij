@@ -7,6 +7,7 @@ from natsort import natsorted
 import numpy as np
 import time
 from datetime import datetime
+import scipy.optimize as opt
 
 def write_to_fits(f_name, data):
     # writes file as fits
@@ -59,3 +60,47 @@ def timefinish(t_initial):
     print "finish: " + str(datetime.now())
     elapsed_time = t_now - t_initial
     print "time elapsed: " + str(elapsed_time) + " s (" + str(elapsed_time / 60.) + " min)"
+
+
+def twoD_Gaussian((x, y), amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
+    xo = float(xo)
+    yo = float(yo)
+    a = (np.cos(theta) ** 2) / (2 * sigma_x ** 2) + (np.sin(theta) ** 2) / (2 * sigma_y ** 2)
+    b = -(np.sin(2 * theta)) / (4 * sigma_x ** 2) + (np.sin(2 * theta)) / (4 * sigma_y ** 2)
+    c = (np.sin(theta) ** 2) / (2 * sigma_x ** 2) + (np.cos(theta) ** 2) / (2 * sigma_y ** 2)
+    # g = offset + amplitude*np.exp( - (a*((x-xo)**2) + 2*b*(x-xo)*(y-yo)
+    # + c*((y-yo)**2)))
+
+    g = amplitude * np.exp(- (a * ((x - xo) ** 2) + 2 * b * (x - xo) * (y - yo)
+                              + c * ((y - yo) ** 2)))
+    return g.ravel()
+
+def gauss2dfit(data, lim1, lim2, p_tmp):
+    # data = 2d square array
+    # lim2, lim2 = subarray bounds for fitting (also square)
+    # guess = initial guess (amplitude, xo, yo, sigma_x, sigma_y, theta, offset)
+
+    x = np.linspace(0, data.shape[0] - 1, data.shape[0])
+    y = np.linspace(0, data.shape[0] - 1, data.shape[0])
+    x, y = np.meshgrid(x, y)
+    # print x.shape
+    subx = x[lim1:lim2, lim1:lim2]
+    suby = y[lim1:lim2, lim1:lim2]
+    subdata = data[lim1:lim2, lim1:lim2]
+    # print p_tmp
+    pt, pc = opt.curve_fit(twoD_Gaussian, (subx, suby), subdata.ravel(), p0=p_tmp)
+
+    z = twoD_Gaussian((x, y), *pt)
+    data_fitted = z.reshape(data.shape)
+
+    return data_fitted, pt
+
+def get_subimage(im0, x,y, winsize):
+    d = winsize/2. # half of subimage size
+
+    xlow = int(x-d)
+    xhigh = int(x+d)
+    ylow = int(y-d)
+    yhigh = int(y+d)
+
+    return im0[ylow:yhigh, xlow:xhigh]  # select sub-image around nominal pre-calc'd Tycho postn
