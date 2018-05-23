@@ -64,7 +64,7 @@ def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
                'sky_ref2': np.nan,
                'sky_ref3': np.nan,
                'sky_ref4': np.nan,
-               'sky_ref6': np.nan
+               # 'sky_ref6': np.nan
 
                # add flags here
                }
