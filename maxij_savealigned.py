@@ -63,4 +63,4 @@ def align_rebin(filename,scipathnam,apathnam,imshifts):
 
 
 if __name__ == "__main__":
-    savealigned('test', n2 = 10)
+    savealigned('test', n2 = 10, path = './')
