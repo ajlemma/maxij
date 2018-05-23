@@ -1,5 +1,5 @@
 #######
-''' maxij_database_init.py
+''' maxij_initdb.py
 by A Townsend
 1. initializes dataframe
 2. parses file IDs and times and adds them to the datbase
