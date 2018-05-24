@@ -3,9 +3,9 @@ from matplotlib import pyplot as plt
 # import numpy as np
 
 
-# path='/media/amanda/demeter/maxi_j1820_070/'
-path = './'
-night = 'test'
+path='/media/amanda/demeter/maxi_j1820_070/'
+# path = './'
+night = '2018-05-05'
 
 #read in data as pandas dataframe:
 data = pd.read_pickle(path+night+'/photdata_'+night+'.pkl')
@@ -24,12 +24,12 @@ ref5_phot = data['phot_ref5']
 ref6_phot = data['phot_ref6']
 
 time = data['os_time']
-for i in range(len(tyc_phot)):
-    print('tyc flux = %5.2f' % tyc_phot[i])
-    print('MAXIJ flux = %5.2f' % maxij_phot[i])
+# for i in range(len(tyc_phot)):
+#     print('tyc flux = %5.2f' % tyc_phot[i])
+#     print('MAXIJ flux = %5.2f' % maxij_phot[i])
 
 # plot lightcurves:
-plt.plot(time,maxij_phot,'.')
-plt.plot(time,tyc_phot/6.,'g.')
-plt.plot(time,ref2_phot+ref4_phot+ref6_phot,'r.')
+plt.plot(time,maxij_phot,'.-')
+plt.plot(time,tyc_phot/8,'g-.')
+plt.plot(time,ref3_phot+ref4_phot,'r-.')
 plt.show()
