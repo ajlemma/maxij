@@ -48,7 +48,10 @@ def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
                'gauss_params_4_sigma_y': np.nan,
                'gauss_params_5_theta': np.nan,
                'gauss_params_6_offset': np.nan,
+
                'gauss_sigma_avg': np.nan,  # avg of sigma_x and sigma_y
+               'gauss_offset_dx': np.nan,  # actual delta x offset of tyc star from initial meas.
+               'gauss_offset_dy': np.nan,  # actual delta y offset of tyc star from initial meas.
 
                # maxij + refstar photometry
                'phot_tyc': np.nan,
@@ -56,6 +59,7 @@ def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
                'phot_ref2': np.nan,
                'phot_ref3': np.nan,
                'phot_ref4': np.nan,
+               'phot_ref5': np.nan,
                'phot_ref6': np.nan,
 
                # sky photometry
@@ -64,6 +68,7 @@ def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
                'sky_ref2': np.nan,
                'sky_ref3': np.nan,
                'sky_ref4': np.nan,
+               'sky_ref5': np.nan,
                'sky_ref6': np.nan
 
                # add flags here
