@@ -129,13 +129,12 @@ def measure_star(im0,x,y,sg):
     r2 = r - 10 * sg
     sky = np.median(im0[np.abs(r2) < (2 * sg)])
 
+    #photometer 3-sigma aperture & subtract sky
+    flux = np.sum(im0[r<(3.*sg)])-sky*len(im0[r<(3.*sg)].ravel())
+
     #sky annulus for plotting:
     skyplot = r
     skyplot[np.abs(r2) > (2 * sg)] = 0
-
-    #photometer 3-sigma aperture & subtract sky
-    flux = np.sum(im0[r < (3. * sg)]) - sky * len(im0[r < (3. * sg)].ravel())
-
 
     return sky, flux, skyplot
 
