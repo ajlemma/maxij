@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 path='/media/amanda/demeter/maxi_j1820_070/'
 # path = './'
-night = '2018-05-05'
+night = '2018-03-30'
 
 #read in data as pandas dataframe:
 data = pd.read_pickle(path+night+'/photdata_'+night+'.pkl')
@@ -30,6 +30,6 @@ time = data['os_time']
 
 # plot lightcurves:
 plt.plot(time,maxij_phot,'.-')
-plt.plot(time,tyc_phot/8,'g-.')
-plt.plot(time,ref3_phot+ref4_phot,'r-.')
+plt.plot(time,tyc_phot/5,'g-.')
+plt.plot(time,ref3_phot+ref4_phot+ref6_phot+ref5_phot,'r-.')
 plt.show()
