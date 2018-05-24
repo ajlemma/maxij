@@ -64,7 +64,6 @@ def dophot(night, path='/media/amanda/demeter/maxi_j1820_070/',savecheck = 100):
         # maxij + refstar photometry
         dataf.loc[fid,'phot_tyc'] = results[5][0]
         dataf.loc[fid,'phot_maxij'] = results[5][1]
-        # print results[5][1]
         dataf.loc[fid,'phot_ref2'] = results[5][2]
         dataf.loc[fid,'phot_ref3'] = results[5][3]
         dataf.loc[fid,'phot_ref4'] = results[5][4]
