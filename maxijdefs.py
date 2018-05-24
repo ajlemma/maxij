@@ -96,6 +96,7 @@ def gauss2dfit(data, lim1, lim2, p_tmp):
     return data_fitted, pt
 
 def get_subimage(im0, x,y, winsize):
+
     d = winsize/2. # half of subimage size
 
     xlow = int(x-d)
@@ -103,4 +104,57 @@ def get_subimage(im0, x,y, winsize):
     ylow = int(y-d)
     yhigh = int(y+d)
 
-    return im0[ylow:yhigh, xlow:xhigh]  # select sub-image around nominal pre-calc'd Tycho postn
+    return im0[ylow:yhigh, xlow:xhigh]  # select sub-image around nominal pre-calc'd Tycho pos'n
+
+def get_grid(imshape):
+
+    xx = np.arange(imshape[1])
+    yy = np.arange(imshape[0])
+    #XX, YY = np.meshgrid(xx, yy)
+    return np.meshgrid(xx, yy)
+
+
+def mkrad(imshape,xc,yc):
+
+    x,y=get_grid(imshape)
+    return ((x-xc)**2. + (y-yc)**2.)**0.5
+
+
+def measure_star(im0,x,y,sg):
+
+    # array of distances from star
+    r = mkrad(im0.shape, x,y)
+
+    # get median sky value in annulus centered 10 pixels from Tycho +-2-sigma
+    r2 = r - 10 * sg
+    sky = np.median(im0[np.abs(r2) < (2 * sg)])
+
+    #sky annulus for plotting:
+    skyplot = r
+    skyplot[np.abs(r2) > (2 * sg)] = 0
+
+    #photometer 3-sigma aperture & subtract sky
+    flux = np.sum(im0[r < (3. * sg)]) - sky * len(im0[r < (3. * sg)].ravel())
+
+
+    return sky, flux, skyplot
+
+
+# sky annulus transparency colormap
+cdict = {'red':   ((0.0,  1.0, 1.0),
+                   (0.5,  1.0, 1.0),
+                   (1.0,  0.0, 0.0)),
+
+         'green': ((0.0,  0.0, 0.0),
+                   (0.5,  1.0, 1.0),
+                   (1.0,  0.8, 0.8)),
+
+         'blue':  ((0.0,  0.0, 0.0),
+                   (0.5,  0.0, 0.0),
+                   (1.0,  0.4, 0.4))}
+
+cdict4 = cdict.copy()
+a = .45
+cdict4['alpha'] = ((0.0, 0.0, 0.0),
+                   (0.5, a, a),
+                   (1.0, a, a))
