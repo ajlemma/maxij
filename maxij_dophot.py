@@ -6,7 +6,7 @@ by A Townsend
 #######
 
 import pandas as pd
-# import numpy as np
+import numpy as np
 from maxijdefs import *
 from multiprocessing import Pool
 from functools import partial
@@ -43,10 +43,45 @@ def dophot(night, path='/media/amanda/demeter/maxi_j1820_070/',savecheck = 100):
                                             refs = refs,
                                             savecheck = savecheck),
                                     fileID, 25):
-        print "maxi j1820 flux at " + dataf.loc[results[0]]['filetime'] + ': '+ str(results[4][1])
+        # print "maxi j1820 flux at " + dataf.loc[results[0]]['filetime'] + ': '+ str(results[4][1])
         #assign results to things in dataf
+        # results = id, pt, sg, [dx, dy], sky, flux
+        fid = results[0]
 
-    #dataf.to_pickle(pathnam + 'photdata_'+night+'.pkl')
+        # guassian parameters
+        dataf.loc[fid,'gauss_params_0_amplitude'] = results[1][0]
+        dataf.loc[fid,'gauss_params_1_x0'] = results[1][1]
+        dataf.loc[fid,'gauss_params_2_y0'] = results[1][2]
+        dataf.loc[fid,'gauss_params_3_sigma_x'] = results[1][3]
+        dataf.loc[fid,'gauss_params_4_sigma_y'] = results[1][4]
+        dataf.loc[fid,'gauss_params_5_theta'] = results[1][5]
+        dataf.loc[fid,'gauss_params_6_offset'] = results[1][6]
+        dataf.loc[fid,'gauss_sigma_avg'] = results[2]
+
+        dataf.loc[fid,'gauss_offset_dx'] = results[3][0]
+        dataf.loc[fid,'gauss_offset_dy'] = results[3][1]
+
+        # maxij + refstar photometry
+        dataf.loc[fid,'phot_tyc'] = results[5][0]
+        dataf.loc[fid,'phot_maxij'] = results[5][1]
+        # print results[5][1]
+        dataf.loc[fid,'phot_ref2'] = results[5][2]
+        dataf.loc[fid,'phot_ref3'] = results[5][3]
+        dataf.loc[fid,'phot_ref4'] = results[5][4]
+        dataf.loc[fid,'phot_ref5'] = results[5][5]
+        dataf.loc[fid,'phot_ref6'] = results[5][6]
+
+        # sky photometry
+        dataf.loc[fid,'sky_tyc'] = results[4][0]
+        dataf.loc[fid,'sky_maxij'] = results[4][1]
+        dataf.loc[fid,'sky_ref2'] = results[4][2]
+        dataf.loc[fid,'sky_ref3'] = results[4][3]
+        dataf.loc[fid,'sky_ref4'] = results[4][4]
+        dataf.loc[fid,'sky_ref5'] = results[4][5]
+        dataf.loc[fid,'sky_ref6'] = results[4][6]
+
+    print "Saving photometry database to " + night + '/photdata_'+night+'.pkl'
+    dataf.to_pickle(pathnam + 'photdata_'+night+'.pkl')
 
     timefinish(time0)
     return dataf
@@ -74,8 +109,6 @@ def multiphot(id, dataf, pathnam, apathnam, refs, savecheck):
     ax = plt.gca()
     ax.cla()  # clear things for fresh plot
     plt.imshow(np.arcsinh(im0+10000),cmap='gray')
-    # ax.add_artist(plt.Circle((tx0 + dx, ty0 + dy), 3.*sg, color='y', fill=False))
-
 
     sky = np.zeros(len(refs.index))
     flux = np.zeros(len(refs.index))
@@ -94,12 +127,10 @@ def multiphot(id, dataf, pathnam, apathnam, refs, savecheck):
         if i == 1:
             # maxij in blue
             ax.add_artist(plt.Circle((rx, ry), 3. * sg, color='b', fill=False))
-
             plt.text(rx, ry+10*sg, 'maxi j1820+070', ha="center", family='sans-serif', size=14, color = 'blue')
             plt.text(10, 235, 'BH f=' + str(np.rint(flux[i])) + ', sky=' + str(np.rint(sky[i])), family='sans-serif', size=14, color='blue')
         else:
             # the reference stars in red
-            # name = 'refstar'+str(int(i)+1)
             ax.add_artist(plt.Circle((rx, ry), 3. * sg, color='r', fill=False))
             plt.text(rx, ry-5*sg, 'r' + str(i+1), ha="center", family='sans-serif', size=14, color = 'red')
 
