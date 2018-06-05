@@ -18,4 +18,6 @@ shiftdata = pd.read_csv(path+night+'/imshifts_test.txt',
                         delimiter = r"\s+",
                         names=['filename', 'xshift', 'yshift','shift_amplitude'],)
 
+# use maxij_initdb code to put shifts values into big db and then resave them
+
 print shiftdata
