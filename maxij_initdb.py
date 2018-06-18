@@ -1,10 +1,10 @@
 #######
 ''' maxij_initdb.py
 by A Townsend
-- checks to make sure all files are available in night folder
-- initializes database as pandas dataframe
-- parses file IDs and times and adds them to the datbase
-- saves to pickle file to be read into later code
+- check files
+- initialize database as pandas dataframe
+- parse file IDs and times and adds them to the datbase
+- save dataframe to pickle file to be read into later code
 '''
 #######
 
