@@ -8,7 +8,7 @@ path='/media/amanda/demeter/maxi_j1820_070/'
 night = '2018-05-05'
 
 #read in data as pandas dataframe:
-data = pd.read_pickle(path+night+'/photdata_'+night+'.pkl')
+data = pd.read_pickle(path+night+'/photdata_'+night+'_shifts.pkl')
 print data
 
 #access data with column headers, here's a full list of the ones available:
