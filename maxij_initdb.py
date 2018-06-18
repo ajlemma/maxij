@@ -1,9 +1,10 @@
 #######
 ''' maxij_initdb.py
 by A Townsend
-1. initializes dataframe
-2. parses file IDs and times and adds them to the datbase
-3. saves to pickle file to be read into later code
+- checks to make sure all files are available in night folder
+- initializes database as pandas dataframe
+- parses file IDs and times and adds them to the datbase
+- saves to pickle file to be read into later code
 '''
 #######
 
@@ -11,19 +12,58 @@ import pandas as pd
 from maxijdefs import *
 from multiprocessing import Pool
 from functools import partial
-
+import os
+import shutil
 
 #######
 
 def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
     time0 = timestart()
+    pathnam = path + night + '/'
+    spathnam = pathnam + 'science/'  # folder for science images
+
+
+    print "Checking files..."
+
+    if not os.path.isdir(path+night):
+        print "No folder exists for this night. Exiting..."
+        return None
+
+    if not os.path.isfile(pathnam + 'timestamps_' + night + '.txt'):
+        print "Missing os timestamps file. Exiting..."
+        return None
+
+    if not os.path.isdir(path+night+"/science"):
+        print "No 'science' folder found, please rename folder containing science images."
+        print "Exiting..."
+        return None
+
+    if not os.path.isdir(path+night+"/aligned"):
+        print "No 'aligned' folder found, creating 'aligned' folder..."
+        os.mkdir(path+night+"/aligned")
+
+    if os.path.isdir(path+night+"/science/aligned"):
+        print "Reference image 'aligned' folder still exists in 'science' directory."
+        print "Deleting '/science/aligned' folder..."
+        shutil.rmtree(path+night+"/science/aligned")
+
+    if not os.path.isfile(path+night+"/ref_stack.fits"):
+        print "Warning, no reference image found."
+        print "Please save a stacked reference image as 'ref_stack.fits' in the night folder."
+        print "Continuing database initialization..."
+        print
+
+    if not os.path.isfile(path+night+"/ref_stars_xy.txt"):
+        print "Warning, no reference star position file found."
+        print "Please save an AIJ measurement file as 'ref_stars_xy.txt' in the night folder."
+        print "Continuing database initialization..."
+        print
+
+
     print "Initializing database for " + night + "..."
 
-    pathnam = path + night + '/'
-    apathnam = pathnam + 'aligned/'  # folder for aligned images
-
-    print "Getting list of filenames from " + night + "/aligned ..."
-    fnames = get_filelist_maxi(apathnam)  # list of sorted filenames for aligned images in pathnam
+    print "Getting list of filenames from " + night + "/science ..."
+    fnames = get_filelist_maxi(spathnam)  # list of sorted filenames for aligned images in pathnam
     fnames = fnames
 
     fileID = [n.split('_')[2] for n in fnames]
@@ -102,7 +142,6 @@ def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
     return maxiframe
 
 
-
 def assign_times(id, maxiframe, ostime):
     ftime = parse_time(maxiframe.loc[id, 'filename'])
     ftime_s = get_sec(ftime)
@@ -111,5 +150,7 @@ def assign_times(id, maxiframe, ostime):
 
 
 if __name__ == "__main__":
-    initdb('test', path='./')
+    # initdb('test', path='./')
     # print initdb('2018-03-28')
+    initdb('2018-04-13')
+    # initdb('brokentest')
