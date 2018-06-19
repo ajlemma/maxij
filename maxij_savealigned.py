@@ -60,7 +60,7 @@ def savealigned(night, n1 = 0, n2 = 'max', path='/media/amanda/demeter/maxi_j182
     # load pandas df
     msg = "Loading database for " + night + "..."
     loglist = addlog(msg, loglist)
-    dataf = pd.read_pickle(pathnam + 'data_'+night+'.pkl')
+    dataf = pd.read_pickle(pathnam+"data_"+night+".pkl")
 
     fileID = dataf['fileID']
     fnames = dataf['filename']
