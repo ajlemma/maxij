@@ -52,14 +52,15 @@ def parse_time(fname):
     return fname[ss - 2:ss + 6]
 
 def timestart():
-    print "start: " + str(datetime.now())
-    return time.time()
+    msg = "start: " + str(datetime.now())
+    return time.time(), msg
 
 def timefinish(t_initial):
     t_now = time.time()
-    print "finish: " + str(datetime.now())
     elapsed_time = t_now - t_initial
-    print "time elapsed: " + str(elapsed_time) + " s (" + str(elapsed_time / 60.) + " min)"
+    msg = "finish: " + str(datetime.now()) + " \n" \
+        "time elapsed: " + str(elapsed_time) + " s (" + str(elapsed_time / 60.) + " min)"
+    return msg
 
 
 def twoD_Gaussian((x, y), amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
@@ -137,6 +138,11 @@ def measure_star(im0,x,y,sg):
     skyplot[np.abs(r2) > (2 * sg)] = 0
 
     return sky, flux, skyplot
+
+def addlog(phrase,list):
+    print phrase
+    list.append(phrase)
+    return list
 
 
 # sky annulus transparency colormap
