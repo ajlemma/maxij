@@ -169,19 +169,7 @@ def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
 
     msg = "Writing screen output to logfile..."
     loglist = addlog(msg, loglist)
-
-    if not os.path.isfile(pathnam + "logfile_"+night+".txt"):
-        msg = "Log file does not exist. Creating 'logfile_"+night+".txt' ..."
-        f = open(pathnam + "logfile_"+night+".txt","w+")
-    else:
-        f = open(pathnam + "logfile_"+night+".txt","a")
-
-    for msg in loglist:
-        print>>f, msg
-    print>>f
-    f.close()
-
-
+    writelog(loglist,night)
 
     return maxiframe
 
