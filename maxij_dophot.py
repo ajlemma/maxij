@@ -1,7 +1,15 @@
 #######
 ''' maxij_dophot.py
-by A Townsend
-1.
+by A Townsend, based on/using original code by SSE
+- check files
+- read in pandas dataframe with filenames
+- read in list of reference star positions
+- first star in list is the bright tycho reference star; (2nd is maxij1820+070)
+- adjust aperture positions to bright star position (minor adjustment)
+- & choose aperture size based on bright star gaussian fit
+- photometer each reference star (aperture photometry with a sky annulus)
+- add photometry & all parameters to the df and save it
+- append/save screen output to log file
 
 takes about 2.5 min for 10,000 images
 '''
@@ -13,29 +21,87 @@ from maxijdefs import *
 from multiprocessing import Pool
 from functools import partial
 from astropy.io import fits
+import os
+from datetime import datetime
+import shutil
 
 #######
 
-
+## note: if dophot throws lots of errors and fails, you probably need a better reference image!!!
 
 def dophot(night, path='/media/amanda/demeter/maxi_j1820_070/'):
-    time0 = timestart()
-    print "Analyzing images for " + night + "..."
+
+    loglist = []  # initialize log
+
+    # housekeeping stuff
+    msg = "Running 'maxij_dophot.py' code on data in '" + night + "' folder..."
+    loglist = addlog(msg, loglist)
+
+    time0, msg = timestart()
+    loglist = addlog(msg, loglist)
 
     pathnam = path + night + '/'
     apathnam = pathnam + 'aligned/'  # folder for aligned images
 
-    print "Loading database for " + night + "..."
-    dataf = pd.read_pickle(pathnam + 'data_'+night+'.pkl')
-    fileID = dataf['fileID']
+    # check to make sure all necessary files are available before starting
+    msg = "Checking files..."
+    loglist = addlog(msg,loglist)
 
-    print "Loading list of reference star positions..."
+    if not os.path.isdir(path+night):
+        msg = "No folder exists for this night. Exiting..."
+        loglist = addlog(msg, loglist)
+        return None
+
+    if not os.path.isdir(path+night+"/aligned"):
+        msg = "No 'aligned' folder found, please re-run savealigned() function for this night."
+        loglist = addlog(msg, loglist)
+
+    if not os.path.isfile(path+night+"/ref_stars_xy.txt"):
+        msg = "No reference star position file found. \n" \
+              "Please save an AIJ measurement file as 'ref_stars_xy.txt' in the night folder. \n" \
+              "Exiting... \n"
+        loglist = addlog(msg, loglist)
+        return None
+
+    if not os.path.isfile(pathnam+"data_"+night+".pkl"):
+        msg = "No database called '" + "data_"+night+".pkl" + "' exists. \n " \
+            "Please run initdb() to initialize the database, and run getshifts() and savealigned() before " \
+            "running this code. \n " \
+            "Exiting..."
+        loglist = addlog(msg, loglist)
+        return None
+
+    fdate = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    msg = "Making backup of database as 'data_" + night + "_bck_"+fdate+".pkl"
+    loglist = addlog(msg, loglist)
+    shutil.copyfile(pathnam+"data_"+night+".pkl",pathnam+"data_"+night+"_bck_"+fdate+".pkl")
+
+
+    # load pandas df
+    msg = "Loading database for " + night + "..."
+    loglist = addlog(msg, loglist)
+    dataf = pd.read_pickle(pathnam+"data_"+night+".pkl")
+
+    fileID = dataf['fileID']
+    fnames = dataf['filename']
+
+    msg = "Total science frames:  " + str(len(fnames))
+    loglist = addlog(msg, loglist)
+
+
+    # read in AIJ ref star positions file. must have X(FITS) and Y(FITS) positions
+    # (other columns should not cause errors though)
+    msg = "Loading list of reference star positions..."
+    loglist = addlog(msg, loglist)
+
     refs = pd.read_csv(pathnam + 'ref_stars_xy.txt',
                 delimiter=r"\s+")
-    # print refs
 
-    print "Doing photometry..."
-    p = Pool(6)
+    # do aperture photometry on all reference stars,
+    # using multiprocessing
+    msg = "Doing photometry..."
+    loglist = addlog(msg, loglist)
+    p = Pool(6) # uses 6 cpu cores
     for results in p.imap_unordered(partial(multiphot,
                                             dataf = dataf,
                                             pathnam = pathnam,
@@ -78,14 +144,21 @@ def dophot(night, path='/media/amanda/demeter/maxi_j1820_070/'):
         dataf.loc[fid,'sky_ref5'] = results[4][5]
         dataf.loc[fid,'sky_ref6'] = results[4][6]
 
-    print "Saving photometry database to " + night + '/photdata_'+night+'.pkl'
-    dataf.to_pickle(pathnam + 'photdata_'+night+'.pkl')
+    # pickle the pandas dataframe (should have ALL data now!)
+    msg = "Saving photometry database to " + night + '/data_'+night+'.pkl'
+    loglist = addlog(msg, loglist)
+    dataf.to_pickle(pathnam + 'data_'+night+'.pkl')
 
-    timefinish(time0)
+    #get stop time and save screen output to log
+    msg = timefinish(time0)
+    loglist = addlog(msg, loglist)
+
     return dataf
 
 def multiphot(id, dataf, pathnam, apathnam, refs):
-    im0 = fits.getdata(apathnam + dataf.loc[id]['filename'])
+    filename = dataf.loc[id]['filename']
+    afilename = filename.split('.')[0]+'_aligned.' + filename.split('.')[1]
+    im0 = fits.getdata(apathnam + afilename)
 
     tx0 = np.rint(refs.loc[0]['X(FITS)'])
     ty0 = np.rint(refs.loc[0]['Y(FITS)'])
@@ -118,5 +191,8 @@ def multiphot(id, dataf, pathnam, apathnam, refs):
 
 
 if __name__ == "__main__":
-    dophot('test', path='./')
+    try:
+        print dophot('test', path='./')
+    except:
+        print('An error occured.')
     # dophot('2018-03-28')
