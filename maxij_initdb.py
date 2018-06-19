@@ -18,55 +18,74 @@ import shutil
 #######
 
 def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
-    time0 = timestart()
+    loglist = [] #initialize log
+
+    # housekeeping stuff
+    msg = "Running 'maxij_initdb.py' code on data in '" + night + "' folder..."
+    loglist = addlog(msg,loglist)
+
+    time0,msg = timestart()
+    loglist = addlog(msg, loglist)
+
     pathnam = path + night + '/'
-    spathnam = pathnam + 'science/'  # folder for science images
+    scipathnam = pathnam + 'science/'  # folder for science images
 
-
-    print "Checking files..."
+    # check to make sure all necessary files are available before starting
+    msg = "Checking files..."
+    loglist = addlog(msg,loglist)
 
     if not os.path.isdir(path+night):
-        print "No folder exists for this night. Exiting..."
+        msg = "No folder exists for this night. Exiting..."
+        loglist = addlog(msg, loglist)
         return None
 
     if not os.path.isfile(pathnam + 'timestamps_' + night + '.txt'):
-        print "Missing os timestamps file. Exiting..."
+        msg = "Missing os timestamps file. Exiting..."
+        loglist = addlog(msg, loglist)
         return None
 
     if not os.path.isdir(path+night+"/science"):
-        print "No 'science' folder found, please rename folder containing science images."
-        print "Exiting..."
+        msg = "No 'science' folder found, please rename folder containing science images. \n Exiting..."
+        loglist = addlog(msg, loglist)
         return None
 
     if not os.path.isdir(path+night+"/aligned"):
-        print "No 'aligned' folder found, creating 'aligned' folder..."
+        msg = "No 'aligned' folder found, creating 'aligned' folder..."
+        loglist = addlog(msg, loglist)
         os.mkdir(path+night+"/aligned")
 
     if os.path.isdir(path+night+"/science/aligned"):
-        print "Reference image 'aligned' folder still exists in 'science' directory."
-        print "Deleting '/science/aligned' folder..."
+        msg = "Reference image 'aligned' folder still exists in 'science' directory."
+        loglist = addlog(msg, loglist)
+        msg = "Deleting '/science/aligned' folder..."
+        loglist = addlog(msg, loglist)
         shutil.rmtree(path+night+"/science/aligned")
 
     if not os.path.isfile(path+night+"/ref_stack.fits"):
-        print "Warning, no reference image found."
-        print "Please save a stacked reference image as 'ref_stack.fits' in the night folder."
-        print "Continuing database initialization..."
-        print
+        msg = "Warning, no reference image found. \n" \
+              "Please save a stacked reference image as 'ref_stack.fits' in the night folder. \n " \
+              "Continuing database initialization... \n"
+        loglist = addlog(msg, loglist)
 
     if not os.path.isfile(path+night+"/ref_stars_xy.txt"):
-        print "Warning, no reference star position file found."
-        print "Please save an AIJ measurement file as 'ref_stars_xy.txt' in the night folder."
-        print "Continuing database initialization..."
-        print
+        msg = "Warning, no reference star position file found. \n" \
+              "Please save an AIJ measurement file as 'ref_stars_xy.txt' in the night folder. \n" \
+              "Continuing database initialization... \n"
+        loglist = addlog(msg, loglist)
 
 
-    print "Initializing database for " + night + "..."
+    msg = "Initializing database for " + night + "..."
+    loglist = addlog(msg, loglist)
 
-    print "Getting list of filenames from " + night + "/science ..."
-    fnames = get_filelist_maxi(spathnam)  # list of sorted filenames for aligned images in pathnam
+    # read in list of sorted filenames in the science folder
+    msg = "Getting list of filenames from " + night + "/science ..."
+    loglist = addlog(msg, loglist)
+    fnames = get_filelist_maxi(scipathnam)
     fnames = fnames
 
     fileID = [n.split('_')[2] for n in fnames]
+
+    # set up a dictionary of column headers for the pandas dataframe
     maxidat = {'fileID': fileID,
                'filename': fnames,
 
@@ -111,11 +130,13 @@ def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
                'sky_ref5': np.nan,
                'sky_ref6': np.nan
 
-               # add flags here
+               # add flags here ?
                }
-    maxiframe = pd.DataFrame(maxidat, index=fileID)
+    maxiframe = pd.DataFrame(maxidat, index=fileID) #create the df
 
-    print "Getting os timestamp data..."
+    # read in os times data
+    msg = "Getting os timestamp data..."
+    loglist = addlog(msg, loglist)
     ostime = pd.read_csv(pathnam + 'timestamps_' + night + '.txt',
                          skiprows=2,
                          header=None,
@@ -127,7 +148,9 @@ def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
     ostime['fileID'] = fileID_os
     ostime = ostime.set_index('fileID')
 
-    print "Adding times to database..."
+    # add times to the pandas df
+    msg = "Adding times to database..."
+    loglist = addlog(msg, loglist)
     p = Pool(6)
     for results in p.imap_unordered(partial(assign_times, maxiframe=maxiframe, ostime=ostime), fileID,25):
         # print results
@@ -135,10 +158,31 @@ def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
         maxiframe.loc[results[0], 'filetime_s'] = results[2]
         maxiframe.loc[results[0], 'os_time'] = results[3]
 
-    print "Saving database to " + pathnam + 'data_'+night+'.pkl'
+    # write pandas df to file in night folder
+    msg = "Saving database to " + pathnam + 'data_'+night+'.pkl'
+    loglist = addlog(msg, loglist)
     maxiframe.to_pickle(pathnam + 'data_'+night+'.pkl')
 
-    timefinish(time0)
+    #get stop time and save screen output to log
+    msg = timefinish(time0)
+    loglist = addlog(msg, loglist)
+
+    msg = "Writing screen output to logfile..."
+    loglist = addlog(msg, loglist)
+
+    if not os.path.isfile(pathnam + "logfile_"+night+".txt"):
+        msg = "Log file does not exist. Creating 'logfile_"+night+".txt' ..."
+        f = open(pathnam + "logfile_"+night+".txt","w+")
+    else:
+        f = open(pathnam + "logfile_"+night+".txt","a")
+
+    for msg in loglist:
+        print>>f, msg
+    print>>f
+    f.close()
+
+
+
     return maxiframe
 
 
@@ -150,7 +194,7 @@ def assign_times(id, maxiframe, ostime):
 
 
 if __name__ == "__main__":
-    # initdb('test', path='./')
+    initdb('test', path='./')
     # print initdb('2018-03-28')
-    initdb('2018-04-13')
+    # initdb('2018-04-13')
     # initdb('brokentest')
