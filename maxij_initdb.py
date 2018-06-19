@@ -167,9 +167,10 @@ def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
     msg = timefinish(time0)
     loglist = addlog(msg, loglist)
 
+    # write/append screen output to logfile
     msg = "Writing screen output to logfile..."
     loglist = addlog(msg, loglist)
-    writelog(loglist,night)
+    writelog(loglist,night,pathnam)
 
     return maxiframe
 
