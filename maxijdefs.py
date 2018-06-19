@@ -144,6 +144,18 @@ def addlog(phrase,list):
     list.append(phrase)
     return list
 
+def writelog(loglist,night):
+    if not os.path.isfile(pathnam + "logfile_"+night+".txt"):
+        msg = "Log file does not exist. Creating 'logfile_"+night+".txt' ..."
+        loglist = addlog(msg, loglist)
+        f = open(pathnam + "logfile_"+night+".txt","w+")
+    else:
+        f = open(pathnam + "logfile_"+night+".txt","a")
+
+    for msg in loglist:
+        print>>f, msg
+    print>>f
+    f.close()
 
 # sky annulus transparency colormap
 cdict = {'red':   ((0.0,  1.0, 1.0),
