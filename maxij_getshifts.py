@@ -107,9 +107,12 @@ def getshifts(night, n1 = 0, n2 = 'max',path='/media/amanda/demeter/maxi_j1820_0
         dataf.loc[fid, 'shift_x'] = results[2]
         dataf.loc[fid, 'shift_corr_amplitude'] = results[3]
 
-    msg = "Image shifts are saved in data_"+night+".pkl"
-    loglist = addlog(msg, loglist)
 
+    # for fID in fileID:
+    #     print dataf.loc[fID, 'shift_x']
+    msg = "Saving photometry database to " + night + '/photdata_'+night+'.pkl'
+    loglist = addlog(msg, loglist)
+    dataf.to_pickle(pathnam+"data_"+night+".pkl")
 
     #get stop time and save screen output to log
     msg = timefinish(time0)
