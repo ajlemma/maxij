@@ -8,6 +8,7 @@ import numpy as np
 import time
 from datetime import datetime
 import scipy.optimize as opt
+import os
 
 def write_to_fits(f_name, data):
     # writes file as fits
@@ -144,7 +145,7 @@ def addlog(phrase,list):
     list.append(phrase)
     return list
 
-def writelog(loglist,night):
+def writelog(loglist,night,pathnam):
     if not os.path.isfile(pathnam + "logfile_"+night+".txt"):
         msg = "Log file does not exist. Creating 'logfile_"+night+".txt' ..."
         loglist = addlog(msg, loglist)
