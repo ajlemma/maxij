@@ -5,10 +5,10 @@ from matplotlib import pyplot as plt
 
 path='/media/amanda/demeter/maxi_j1820_070/'
 # path = './'
-night = '2018-05-05'
+night = '2018-04-13'
 
 #read in data as pandas dataframe:
-data = pd.read_pickle(path+night+'/photdata_'+night+'_shifts.pkl')
+data = pd.read_pickle(path+night+'/data_'+night+'.pkl')
 print data
 
 #access data with column headers, here's a full list of the ones available:
@@ -30,11 +30,12 @@ time = data['os_time']
 #     print('MAXIJ flux = %5.2f' % maxij_phot[i])
 
 # plot lightcurves:
-plt.plot(time,maxij_phot,'.-')
+plt.plot(time,maxij_phot,'.-b')
 # plt.plot(time,tyc_phot/5,'g-.')
 # plt.plot(time,ref3_phot+ref4_phot+ref6_phot+ref5_phot,'r-.')
 
-plt.plot(time,tyc_phot/9,'g.-')
-plt.plot(time,ref3_phot+ref4_phot,'r.-')
+plt.plot(time,tyc_phot/5,'g.-')
+plt.plot(time,(ref3_phot+ref4_phot),'r.-')
+# plt.plot(time,(maxij_phot/(ref3_phot+ref4_phot+ref5_phot)),'r.-')
 
 plt.show()
