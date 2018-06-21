@@ -56,12 +56,22 @@ def dophot(night, path='/media/amanda/demeter/maxi_j1820_070/'):
         msg = "No 'aligned' folder found, please re-run savealigned() function for this night."
         loglist = addlog(msg, loglist)
 
-    if not os.path.isfile(path+night+"/ref_stars_xy.txt"):
-        msg = "No reference star position file found. \n" \
-              "Please save an AIJ measurement file as 'ref_stars_xy.txt' in the night folder. \n" \
-              "Exiting... \n"
-        loglist = addlog(msg, loglist)
-        return None
+    if not os.path.isfile(path + night + "/ref_stars_xy.txt"):
+        if not os.path.isfile(pathnam + "MeasurementsXY.txt"):
+            msg = "No reference star position file found. \n" \
+                  "Please save an AIJ measurement file as 'ref_stars_xy.txt' in the night folder. \n" \
+                  "Exiting... \n"
+            loglist = addlog(msg, loglist)
+            return None
+        else:
+            msg = "Converting 'MeasurementsXY.txt' file to a 'ref_stars_xy.txt' file (rebinning)."
+            loglist = addlog(msg, loglist)
+            refsLG = pd.read_csv(pathnam + 'MeasurementsXY.txt',
+                                 delimiter=r"\s+")
+            refsLG2 = refsLG / 4
+            msg = "Saving 'ref_stars_xy.txt' file to night folder."
+            loglist = addlog(msg, loglist)
+            refsLG2.to_csv(pathnam + 'ref_stars_xy.txt', index=None, sep=' ')
 
     if not os.path.isfile(pathnam+"data_"+night+".pkl"):
         msg = "No database called '" + "data_"+night+".pkl" + "' exists. \n " \
