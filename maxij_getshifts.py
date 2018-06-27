@@ -20,6 +20,7 @@ import pandas as pd
 import os
 import shutil
 from datetime import datetime
+import gc
 
 #######
 
@@ -54,10 +55,10 @@ def getshifts(night, n1 = 0, n2 = 'max',path='/media/amanda/demeter/maxi_j1820_0
         loglist = addlog(msg, loglist)
         return None
 
-    fdate = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    msg = "Making backup of database as 'data_" + night + "_bck_"+fdate+".pkl"
+    fdate = datetime.now().strftime("%Y%m%d%H%M%S")
+    msg = "Making backup of database as 'data_" + night + "_bck"+fdate+".pkl"
     loglist = addlog(msg, loglist)
-    shutil.copyfile(pathnam+"data_"+night+".pkl",pathnam+"data_"+night+"_bck_"+fdate+".pkl")
+    shutil.copyfile(pathnam+"data_"+night+".pkl",pathnam+"data_"+night+"_bck"+fdate+".pkl")
 
     if not os.path.isfile(path+night+"/ref_stack.fits"):
         msg = "No reference image found. \n" \
@@ -122,6 +123,10 @@ def getshifts(night, n1 = 0, n2 = 'max',path='/media/amanda/demeter/maxi_j1820_0
     msg = "Writing screen output to logfile..."
     loglist = addlog(msg, loglist)
     writelog(loglist,night,pathnam)
+
+    gc.collect()
+
+    return None
 
 
 def get_shifts(fID,imref,corr_ref,scipathnam,dataf):
