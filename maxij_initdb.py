@@ -14,6 +14,7 @@ from multiprocessing import Pool
 from functools import partial
 import os
 import shutil
+import gc
 
 #######
 
@@ -73,6 +74,12 @@ def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
               "Continuing database initialization... \n"
         loglist = addlog(msg, loglist)
 
+    if os.path.isfile(pathnam+"data_"+night+".pkl"):
+        fdate = datetime.now().strftime("%Y%m%d%H%M%S")
+        msg = "Database called '" + "data_"+night+".pkl" + "' exists. \n " \
+            "Making backup of database as 'data_" + night + "_bck"+fdate+".pkl"
+        loglist = addlog(msg, loglist)
+        shutil.copyfile(pathnam + "data_" + night + ".pkl", pathnam + "data_" + night + "_bck" + fdate + ".pkl")
 
     msg = "Initializing database for " + night + "..."
     loglist = addlog(msg, loglist)
@@ -172,6 +179,7 @@ def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
     loglist = addlog(msg, loglist)
     writelog(loglist,night,pathnam)
 
+    gc.collect()
     return maxiframe
 
 
