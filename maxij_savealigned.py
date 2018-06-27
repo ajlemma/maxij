@@ -17,6 +17,7 @@ from astropy.io import fits
 from multiprocessing import Pool
 from functools import partial
 import os
+import gc
 
 #######
 
@@ -91,6 +92,9 @@ def savealigned(night, n1 = 0, n2 = 'max', path='/media/amanda/demeter/maxi_j182
     msg = "Writing screen output to logfile..."
     loglist = addlog(msg, loglist)
     writelog(loglist,night,pathnam)
+
+    gc.collect()
+    return None
 
 
 def align_rebin(fID,scipathnam,apathnam,dataf):
