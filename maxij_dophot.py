@@ -24,7 +24,7 @@ from astropy.io import fits
 import os
 from datetime import datetime
 import shutil
-
+import gc
 #######
 
 ## note: if dophot throws lots of errors and fails, you probably need a better reference image!!!
@@ -81,10 +81,10 @@ def dophot(night, path='/media/amanda/demeter/maxi_j1820_070/'):
         loglist = addlog(msg, loglist)
         return None
 
-    fdate = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    msg = "Making backup of database as 'data_" + night + "_bck_"+fdate+".pkl"
+    fdate = datetime.now().strftime("%Y%m%d%H%M%S")
+    msg = "Making backup of database as 'data_" + night + "_bck" + fdate + ".pkl"
     loglist = addlog(msg, loglist)
-    shutil.copyfile(pathnam+"data_"+night+".pkl",pathnam+"data_"+night+"_bck_"+fdate+".pkl")
+    shutil.copyfile(pathnam+"data_"+night+".pkl",pathnam+"data_"+night+"_bck"+fdate+".pkl")
 
 
     # load pandas df
@@ -162,7 +162,9 @@ def dophot(night, path='/media/amanda/demeter/maxi_j1820_070/'):
     #get stop time and save screen output to log
     msg = timefinish(time0)
     loglist = addlog(msg, loglist)
+    writelog(loglist, night, pathnam)
 
+    gc.collect()
     return dataf
 
 def multiphot(id, dataf, pathnam, apathnam, refs):
