@@ -117,7 +117,7 @@ def dophot(night, path='/media/amanda/demeter/maxi_j1820_070/'):
                                             pathnam = pathnam,
                                             apathnam = apathnam,
                                             refs = refs),
-                                    fileID, 25):
+                                    fileID, 50):
         # print "maxi j1820 flux at " + dataf.loc[results[0]]['filetime'] + ': '+ str(results[4][1])
         #assign results to things in dataf
         # results = id, pt, sg, [dx, dy], sky, flux
@@ -165,7 +165,7 @@ def dophot(night, path='/media/amanda/demeter/maxi_j1820_070/'):
     writelog(loglist, night, pathnam)
 
     gc.collect()
-    return dataf
+    return None
 
 def multiphot(id, dataf, pathnam, apathnam, refs):
     filename = dataf.loc[id]['filename']
@@ -181,9 +181,15 @@ def multiphot(id, dataf, pathnam, apathnam, refs):
     # plt.show()
 
     # calculate gaussian parameters
-    z, pt = gauss2dfit(subim, 2, 28, (2e4, 15.0, 14.0, 3., 3., 0., 0.))  # 2d Gaussian fit
-    sg = (pt[3] + pt[4]) / 2.0  # get the sigma - average X, Y sigmas
-
+    try:
+        z, pt = gauss2dfit(subim, 2, 28, (2e4, 15.0, 14.0, 3., 3., 0., 0.))  # 2d Gaussian fit
+        sg = (pt[3] + pt[4]) / 2.0  # get the sigma - average X, Y sigmas
+    except:
+        print "image " + id + " failed to get gaussian fit"
+        # loglist = addlog(msg, loglist)
+        gc.collect()
+        return id, [0, 0, 0, 0, 0, 0, 0], 0, [0, 0], [-9999, -9999, -9999, -9999, -9999, -9999, -9999], \
+               [-9999, -9999, -9999, -9999, -9999, -9999, -9999]
     dx = pt[1]-win/2.
     dy = pt[2]-win/2.
 
@@ -195,9 +201,18 @@ def multiphot(id, dataf, pathnam, apathnam, refs):
         rx = np.rint(refs.loc[i]['X(FITS)']) + dx
         ry = np.rint(refs.loc[i]['Y(FITS)']) + dy
 
-        sky[i], flux[i], skyplot = measure_star(im0, rx, ry, sg)
+        try:
+            sky[i], flux[i], skyplot = measure_star(im0, rx, ry, sg)
+        except:
+            print "image " + id + " failed to measure sky and/or flux"
+            # loglist = addlog(msg, loglist)
+            gc.collect()
+            return id, pt, sg, [dx, dy], [-9999, -9999, -9999, -9999, -9999, -9999, -9999], \
+                   [-9999, -9999, -9999, -9999, -9999, -9999, -9999]
 
 
+    im0 = None
+    gc.collect()
     return id, pt, sg, [dx, dy], sky, flux
 
 
@@ -207,4 +222,4 @@ if __name__ == "__main__":
         print dophot('test', path='./')
     except:
         print('An error occured.')
-    # dophot('2018-03-28')
+#     # dophot('2018-03-28')
