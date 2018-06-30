@@ -9,10 +9,12 @@ import time
 from datetime import datetime
 import scipy.optimize as opt
 import os
+import gc
 
 def write_to_fits(f_name, data):
     # writes file as fits
     fits.PrimaryHDU(data).writeto(f_name, overwrite=True)
+    gc.collect()
 
 def get_filelist_maxi(pathname):
     # returns sorted list of filnames in pathname
@@ -157,6 +159,7 @@ def writelog(loglist,night,pathnam):
         print>>f, msg
     print>>f
     f.close()
+    gc.collect()
 
 # sky annulus transparency colormap
 cdict = {'red':   ((0.0,  1.0, 1.0),
