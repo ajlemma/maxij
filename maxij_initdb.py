@@ -180,13 +180,14 @@ def initdb(night, path='/media/amanda/demeter/maxi_j1820_070/'):
     writelog(loglist,night,pathnam)
 
     gc.collect()
-    return maxiframe
+    return None
 
 
 def assign_times(id, maxiframe, ostime):
     ftime = parse_time(maxiframe.loc[id, 'filename'])
     ftime_s = get_sec(ftime)
     ost = ostime.loc[id, 'epochtime(s)']
+    gc.collect()
     return id, ftime, ftime_s, ost
 
 
