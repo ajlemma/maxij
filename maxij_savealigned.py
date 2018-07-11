@@ -104,6 +104,10 @@ def align_rebin(fID,scipathnam,apathnam,dataf):
     im1 = shift(im0, (dataf.loc[fID,"shift_y"], dataf.loc[fID,"shift_x"]), mode='constant', cval=0.0)
     im2 = rebin(im1, (im1.shape[0] / 4, im1.shape[1] / 4))
     write_to_fits(apathnam + filename.split('.')[0]+'_aligned.' + filename.split('.')[1], im2)  # write to aligned subdir, add suffix "_aligned"
+    im0 = None
+    im1 = None
+    im2 = None
+    gc.collect()
     return
 
 
