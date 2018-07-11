@@ -87,7 +87,7 @@ def getshifts(night, n1 = 0, n2 = 'max',path='/media/amanda/demeter/maxi_j1820_0
     msg = "Getting correlation reference..."
     loglist = addlog(msg, loglist)
     imref = fits.getdata(pathnam+'ref_stack.fits') #read in stacked image
-    imref[imref < 1e3] = 0
+    imref[imref < 2e3] = 0
     corr_ref = fftconvolve(imref, imref[::-1, ::-1])  # cross-correlate them
 
     ## define last image
@@ -104,6 +104,7 @@ def getshifts(night, n1 = 0, n2 = 'max',path='/media/amanda/demeter/maxi_j1820_0
     for results in p.imap_unordered(partial(get_shifts, imref = imref,corr_ref = corr_ref,scipathnam = scipathnam,dataf=dataf),
                                   fileID[n1:n2], 25):
         fid = results[0]
+        # print results
         dataf.loc[fid, 'shift_y'] = results[1]
         dataf.loc[fid, 'shift_x'] = results[2]
         dataf.loc[fid, 'shift_corr_amplitude'] = results[3]
@@ -139,7 +140,7 @@ def get_shifts(fID,imref,corr_ref,scipathnam,dataf):
     im0 = fits.getdata(fnam)
 
     im0 = im0 - np.median(im0)
-    im0[im0 < 1e3] = 0
+    im0[im0 < 2e3] = 0
 
     correlation1 = fftconvolve(im0, reference_image[::-1, ::-1])  # cross-correlate them
     correlation2 = correlation1 - correlation_reference
@@ -149,8 +150,9 @@ def get_shifts(fID,imref,corr_ref,scipathnam,dataf):
     yc = xy[0][0]
 
     # print xc, yc
+    gc.collect()
     return (fID, (correlation2.shape[0] / 2) - int(yc), (correlation2.shape[1] / 2) - int(xc), np.max(correlation2) / 1e10)  # required pixel shifts
 
 
-if __name__ == "__main__":
-    getshifts('test', n2 = 10, path = './')
+# if __name__ == "__main__":
+#     getshifts('test', n2 = 10, path = './')
