@@ -35,7 +35,7 @@ elif len(sys.argv) == 4:
     data_location, final_location, exp_time = sys.argv[1], sys.argv[2], sys.argv[3]
 
 else:
-    raise Exception('Incorrect number of command-line arguments specified. Please double check your command!')
+    raise Exception('Incorrect number of command-line arguments specified. Please double-check your command!')
 
 # Output folder name; create the necessary folders
 folder_date = data_location.split('/data')[0].split('/')[-1].replace('_observation', '')
