@@ -28,6 +28,10 @@ if len(sys.argv) == 1:
     if not os.path.exists(final_location):
         raise Exception('The destination folder you entered does not exist. Double-check the path!')
 
+    # Exposure time to use
+    exp_time = raw_input('Enter the exposure time to reduce images for'
+                         '(ex. 1s, 770ms, 2s, etc): ')
+
 elif len(sys.argv) == 3:
     data_location, final_location, exp_time = sys.argv[1], sys.argv[2], '1s'
 
