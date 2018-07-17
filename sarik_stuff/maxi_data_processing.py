@@ -28,11 +28,18 @@ if len(sys.argv) == 1:
     if not os.path.exists(final_location):
         raise Exception('The destination folder you entered does not exist. Double-check the path!')
 
+    # Exposure time to use
+    exp_time = raw_input('Enter the exposure time to reduce images for'
+                         '(ex. 1s, 770ms, 2s, etc): ')
+
 elif len(sys.argv) == 3:
-    data_location, final_location = sys.argv[1], sys.argv[2]
+    data_location, final_location, exp_time = sys.argv[1], sys.argv[2], '1s'
+
+elif len(sys.argv) == 4:
+    data_location, final_location, exp_time = sys.argv[1], sys.argv[2], sys.argv[3]
 
 else:
-    raise Exception('Incorrect number of command-line arguments specified. Please double check your command!')
+    raise Exception('Incorrect number of command-line arguments specified. Please double-check your command!')
 
 # Output folder name; create the necessary folders
 folder_date = data_location.split('/data')[0].split('/')[-1].replace('_observation', '')
@@ -53,9 +60,9 @@ print('Replacing the space in the filenames with an underscore...')
 os.system('/bin/bash -c \'for i in %s/*tiff; do mv "$i" "${i//\ /_}"; done\' >/dev/null 2>&1' % data_location)
 
 # Separates images by file name/type
-dark_image_names = glob('%s/dark_1s*.tiff' % data_location)
+dark_image_names = glob('%s/dark_%s*.tiff' % (data_location, exp_time))
 flat_image_names = glob('%s/flat_1s*.tiff' % data_location)
-maxij_image_names = glob('%s/maxij_1s*.tiff' % data_location)
+maxij_image_names = glob('%s/maxij_%s*.tiff' % (data_location, exp_time))
 
 # Create log file to flag bad pixels
 logfile_name = '%s/%s/badpixels.txt' % (final_location, folder_date)
