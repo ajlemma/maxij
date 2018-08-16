@@ -72,11 +72,18 @@ night = '2018-03-30' # 1s ims are done for this night but it ought to be redone 
 # savealigned(night)
 # dophot(night)
 
-night = '2018-04-14'
+# night = '2018-04-14' # this night is done!
+# runall(night)
+# time.sleep(60)
 
-night = '2018-04-17' # running getshifts, savealigned, dophot
-runall(night)
-time.sleep(60)
+# night = '2018-04-17' # this night is done!
+# runall(night)
+# initdb(night)
+# getshifts(night, n1 = 0, n2 = 10)
+# time.sleep(60)
+# getshifts(night)
+# savealigned(night)
+# dophot(night)
 
 # night = '2018-04-18' # this night is done!
 # runall(night)
@@ -85,13 +92,18 @@ time.sleep(60)
 # getshifts(night, n1 = 0, n2 = 100)
 # dophot(night)
 
-night = '2018-04-19'
-
-night = '2018-04-20'
-
-night = '2018-04-25' # rerunning to see if shifts are better (else always have the backup)
-runall(night)
+# night = '2018-04-19' # this night is done!
+# runall(night)
 # time.sleep(60)
+
+night = '2018-04-20' # only have ~1000 datapoints for this one from beginning & end of night (?)
+# runall(night)
+
+
+# night = '2018-04-25' # this night is done!
+# runall(night)
+# time.sleep(60)
+# dophot(night)
 
 # night = '2018-04-26' # this night is done!
 # runall(night)
@@ -145,6 +157,10 @@ runall(night)
 # time.sleep(60)
 # dophot(night)
 
+night = '2018-05-08'
+# runall(night)
+# time.sleep(60)
+dophot(night)
 
 # night = '2018-05-09' # this night is done!
 # runall(night)
@@ -156,7 +172,7 @@ night = '2018-05-10'   # redo ff/ds, has missing images???
 # time.sleep(60)
 # dophot(night)
 
-night = '2018-05-11'  # i can't get these to align at ALL wtf
+# night = '2018-05-11'  # this night is done!
 # runall(night)
 # time.sleep(60)
 # getshifts(night, n1 = 2000, n2 = 2010)

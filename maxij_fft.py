@@ -95,8 +95,11 @@ def logbin(f,p,df):
     return f2,p2
 
 ## set night
-path = './maxij_data_copies/'
+# path = './maxij_data_copies/'
+
 night = '2018-05-11'
+path = '/media/amanda/demeter/maxi_j1820_070/' + night + '/'
+
 
 ## read in data as pandas dataframe:
 data = pd.read_pickle(path+'data_'+night+'.pkl')

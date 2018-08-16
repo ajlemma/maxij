@@ -6,13 +6,13 @@ import gc
 
 path='/media/amanda/demeter/maxi_j1820_070/'
 # path = './'
-night = '2018-04-25'
+night = '2018-05-08'
 
 #read in data as pandas dataframe:
 # data = pd.read_pickle(path+night+'/photdata_'+night+'_shifts.pkl')
 data = pd.read_pickle(path+night+'/data_'+night+'.pkl')
-print data
-
+# print data.loc['16000']
+print len(data)
 #access data with column headers, here's a full list of the ones available:
 # print list(data.columns.values)
 ## (shift data isn't actually saved in here yet so that's all going to be NaNs if you try to access it)
