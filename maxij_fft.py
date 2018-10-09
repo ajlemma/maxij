@@ -97,7 +97,7 @@ def logbin(f,p,df):
 ## set night
 # path = './maxij_data_copies/'
 
-night = '2018-05-11'
+night = '2018-03-28'
 path = '/media/amanda/demeter/maxi_j1820_070/' + night + '/'
 
 
@@ -178,4 +178,4 @@ ax3.cax.toggle_label(True)
 
 # plt.tight_layout()    # Works, but may still require rect paramater to keep colorbar labels visible
 plt.show()
-fig.savefig('2d_qpo_plots/%s_2d.pdf' % night)
+# fig.savefig('2d_qpo_plots/%s_2d.pdf' % night)
