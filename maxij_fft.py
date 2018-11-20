@@ -140,9 +140,15 @@ rphot = data.loc[tseries,'ref_flux']
 f,pref,preftot = pds_chunk128(ts,rphot,data_0,data_f)
 
 
+
+
 f2,p2max=p_2_logp(f,pmax,0.03,4)
 f2,p2tyc=p_2_logp(f,ptyc,0.03,4)
 f2,p2ref=p_2_logp(f,pref,0.03,4)
+
+# print f2[:1]
+# print np.shape(pmax)
+
 
 # Set up figure and image grid
 fig = plt.figure(figsize=(9,12), facecolor='w')
@@ -157,7 +163,7 @@ grid = ImageGrid(fig, 111,          # as in plt.subplot(111)
                  cbar_size="10%",
                  cbar_pad=0.15,
                  )
-
+print ((10.**f2[:1])*(p2max[:,1:]))
 # Add data to image grid
 ax1 = grid[0]
 ax1.set_title('MAXIJ1820+070')
