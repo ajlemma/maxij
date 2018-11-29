@@ -10,8 +10,6 @@ from maxijdefs import *
 from maxij_nicerdefs import *
 import glob
 # from natsort import natsorted
-
-
 # from itertools import groupby
 # from datetime import datetime
 # from scipy.signal import fftconvolve
