@@ -284,6 +284,16 @@ def pds_chunk128(t,flx,t1,t2):
     return f,p,ptot
 
 
+def pds_single_chunk(flx):
+    clength = len(flx)
+    t = xrange(clength)
+    freqlength = clength / 2
+    freq = np.arange(freqlength) / (np.float(clength))
+    af = np.fft.fft(flx)
+    power = np.abs(af[:freqlength]) ** 2
+
+    return freq, power
+
 def make_1s_ts(tout,tin,cts):
     # makes 1s time series from any lightcurve
     # tout should be an array of integer seconds that the output ts will be matched to
@@ -314,3 +324,29 @@ def chunks(l, n):
         outl.append(l1)
 
     return outl
+
+
+def p_2_logp(f, p, df, n_avg):
+    # takes output of pds_chunk128-style program
+    # averages over n_avg pieces, and logbins the 2D array
+
+    nt = p.shape[0]  # number of power spectra
+
+    for i in range(nt):
+        i1 = i - n_avg / 2
+        i2 = i1 + n_avg / 2
+        if i1 < 0:
+            i1 = 0
+        if i2 > (nt - 1):
+            i2 = nt - 1
+        pmean = np.mean(p[i1:i2 + 1, :], axis=0) / (np.mean(p[i1:i2 + 1, 0]) ** 0.5)
+        dumf, dump = logbin(f, pmean, df)
+        if i == 0:
+            nf = len(dump[dump > 0])
+            p2 = np.zeros([nt, nf])
+            f2 = dumf[dump > 0]
+        p2[i, :] = dump[dump > 0]
+
+    return f2, p2
+
+# f2,p2max=p_2_logp(f,pmax,0.03,8)
