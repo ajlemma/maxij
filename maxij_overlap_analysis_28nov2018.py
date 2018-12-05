@@ -499,24 +499,121 @@ print "plotting mean of all CCFs..."
 # ax.set_ylabel('Amplitude',fontsize=16)
 
 
+xray_maxij_ts = {}
+rho_maxij_ts = {}
+rho_tycho_ts = {}
+
+datadict2 = {}
+
+for c in ochunk_kfix:
+    ch = str(c)
+    xray_maxij_ts[ch] = ochunk_datadict[str(c)]['xray_maxij_fixed_ts']
+    rho_maxij_ts[ch] = ochunk_datadict[str(c)]['rho_maxij_fixed_ts']
+    rho_tycho_ts[ch] = ochunk_datadict[str(c)]['rho_tycho_fixed_ts']
+
+    chunkdict = {'acf_xray_maxij': fftconvolve(xray_maxij_ts[ch], xray_maxij_ts[ch][::-1]),
+                 'acf_rho_maxij': fftconvolve(rho_maxij_ts[ch], rho_maxij_ts[ch][::-1]),
+                 'acf_rho_tycho': fftconvolve(rho_tycho_ts[ch], rho_tycho_ts[ch][::-1]),
+
+                 'ccf_xray_rho_maxij': fftconvolve(xray_maxij_ts[ch], rho_maxij_ts[ch][::-1]),
+                 # cross-correlate = CCF of xray w/ optical (maxij)
+                 'ccf_xray_maxij_rho_tycho_control': fftconvolve(xray_maxij_ts[ch], rho_tycho_ts[ch][::-1]),
+                 # ccf of xray w/ tycho
+
+                 'fft_xray_maxij': np.fft.fft(xray_maxij_ts[ch]),
+                 'fft_rho_maxij': np.fft.fft(rho_maxij_ts[ch]),
+                 'fft_rho_tycho': np.fft.fft(rho_tycho_ts[ch])
+                 }
+    #     chunkframe = pd.DataFrame(chunkdict)
+    datadict2[ch] = chunkdict
 
 
 
+ch = str(ochunk_kfix[5])
+nel2=len(datadict2[ch]['fft_xray_maxij'])/2
+f = np.arange(nel2)/64.
+
+fig10,ax=plt.subplots(figsize=[5,15],facecolor='w')
+subplots_adjust(hspace=0.0000)
+ctot = len(ochunk_kfix)
+fig10.tight_layout()
+fig10.subplots_adjust(top=.95)
+fig10.suptitle('FFTs of all overlapping chunks of 64-second data',fontsize=16)
+
+for c,v in zip(ochunk_kfix,xrange(ctot)):
+    v = v+1
+    ax = subplot(ctot,1,v)
+    ch = str(c)
+    ax.plot(f,np.abs(((datadict2[ch]['fft_xray_maxij'][:nel2]))**2)/np.abs(((datadict2[ch]['fft_xray_maxij'][:nel2]))**2)[0],'b-', lw=2, drawstyle='steps-mid') #xray maxij
+    ax.plot(f,10*np.abs(((datadict2[ch]['fft_rho_maxij'][:nel2]))**2)/np.abs(((datadict2[ch]['fft_rho_maxij'][:nel2]))**2)[0],'r-', lw=2, drawstyle='steps-mid') #optical maxij
+    # ax.plot(f,10*np.abs(((datadict2[ch]['fft_rho_tycho'][:nel2]))**2)/np.abs(((datadict2[ch]['fft_rho_tycho'][:nel2]))**2)[0],'g.-', drawstyle='steps-mid') #tycho
+    ax.axvline(x=ntot/2.,color='y',alpha=.7)
+    ax.axhline(y=0,color='k')
+    ax.axvline(x=0.09, c='k', linestyle='--', lw=2)
+    ax.axvline(x=0.045, c='k', linestyle='--', lw=2)
+# ax.plot(crosscorr_xo - crosscorr_xt,'k')
+# ax.plot(auto_o/4,'r')
+# ax.plot(auto_x,'b')
+# ax.plot(auto_t/3,'k')
+#     ax.plot([np.argmax(auto_x),np.argmax(auto_x)],[-4.e9,2.e10],'y',alpha=.7)
+    ax.set_ylim(0,.01)
+#     ax.set_xlim(0,ntot)
+    ax.set_xlim(0,.5)
+
+# ax.set_title('Optical+X-ray Correlation (one chunk of 128-second overlapping data) 51.5s lead')
+ax.legend(['MaxiJ@Nicer',
+           'MaxiJ@Nicer',
+           'Tycho@RHO',
+           # 'RHO Optical Auto-correlation',
+           # 'Nicer X-ray Auto-correlation',
+           # 'RHO Tycho Reference Auto-correlation',
+#            'Autocorrelation Peak'
+          ],
+         loc='upper center', bbox_to_anchor=(0.5, -0.05),
+          fancybox=True, shadow=True, ncol=3)
+
+# print np.argmax(crosscorr_xo)
 
 
+fig11, ax = plt.subplots(figsize=[5, 15], facecolor='w')
+subplots_adjust(hspace=0.0000)
+ctot = len(ochunk_kfix)
+fig11.tight_layout()
+fig11.subplots_adjust(top=.95)
+fig11.suptitle('Crosspower Spectra - Maxi J1820+070 \n (64s each, 28 Mar 2018)', fontsize=16)
 
+for c, v in zip(ochunk_kfix, xrange(ctot)):
+    v = v + 1
+    ax = subplot(ctot, 1, v)
+    ch = str(c)
 
+    xps = np.abs((datadict2[ch]['fft_xray_maxij'][:nel2] * np.conj(datadict2[ch]['fft_rho_maxij'][:nel2]))) / \
+          np.abs((datadict2[ch]['fft_xray_maxij'][:nel2] * np.conj(datadict2[ch]['fft_rho_maxij'][:nel2])))[0]
+    tycho_xps = np.abs((datadict2[ch]['fft_xray_maxij'][:nel2] * np.conj(datadict2[ch]['fft_rho_tycho'][:nel2]))) / \
+                np.abs((datadict2[ch]['fft_xray_maxij'][:nel2] * np.conj(datadict2[ch]['fft_rho_tycho'][:nel2])))[0]
 
+    ax.plot(f[f > 0], xps[f > 0], 'g-', drawstyle='steps-mid', lw=3)
+    ax.plot(f[f > 0], tycho_xps[f > 0], '-k', drawstyle='steps-mid', alpha=.5, lw=3)
+    # ax.axvline(x=0.0225,color='y',linestyle='--')
+    ax.axvline(x=0.09, c='r', linestyle='--', lw=2)
+    ax.axvline(x=0.045, c='r', linestyle='--', lw=2)
+    # ax.axvline(x=0.18,color='y',linestyle='--')
 
+    ax.set_ylim(0, .002)
+    ax.set_xlim(0, .5)
+    ax.get_yaxis().set_ticks([])
+    if c != np.max(ochunk_kfix):
+        ax.get_xaxis().set_ticks([])
 
+    titletime = ochunk_datadict[ch]['unix_time'][0]
+    ax.set_title(datetime.utcfromtimestamp(titletime).strftime('%Y-%m-%d %H:%M:%S') + " UTC", x=.6, y=.5)
 
+ax.legend(['Maxi J1820+070 X-ray:Optical', 'Maxi J1820+070 X-ray:Reference Star Optical', 'Previously Identified QPOs'],
+          loc='upper center', bbox_to_anchor=(0.5, -0.4),
+          fancybox=True, shadow=True, ncol=1)
 
-
-
-
-
-
-
+ax.set_xlabel('Frequency (Hz)')
+ax.set_ylabel('Normalized Power', y=6)
 
 #######
 print
