@@ -21,6 +21,7 @@ from itertools import groupby
 from scipy.signal import fftconvolve
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 from pylab import subplot, subplots_adjust, legend
 
 #######
@@ -55,18 +56,19 @@ xts = np.asarray(tsdata.loc[night, 'xray_maxij_ts'])
 ots = np.asarray(tsdata.loc[night, 'rho_maxij_ts'])
 tts = np.asarray(tsdata.loc[night, 'rho_tycho_ts'])
 
-# fig1,ax = plt.subplots(figsize=[8,12],facecolor='w')
-# fig1.suptitle('Raw Timeseries Data for ' + night)
-# ax2 = subplot(3,1,2)
-# ax2.plot(times[ots>0],ots[ots>0],'r')
-# ax2.set_title('RHO MAXI J1820+070 Data')
-# ax3 = subplot(3,1,3,sharex=ax2)
-# ax3.plot(times[tts>0],tts[tts>0],'k',alpha=.5)
-# ax3.set_title("RHO Reference Star Data")
-# ax1 = subplot(3,1,1,sharex=ax2)
-# ax1.plot(times[xts>0],xts[xts>0],'b')
-# ax1.set_title('X-ray MAXI J1820+070 Data')
-# # plt.show()
+fig1,ax = plt.subplots(figsize=[8,12],facecolor='w')
+fig1.suptitle('Raw Timeseries Data for ' + night)
+ax2 = subplot(3,1,2)
+ax2.plot(times[ots>0],ots[ots>0],'r')
+ax2.set_title('RHO MAXI J1820+070 Data')
+ax3 = subplot(3,1,3,sharex=ax2)
+ax3.plot(times[tts>0],tts[tts>0],'k',alpha=.5)
+ax3.set_title("RHO Reference Star Data")
+ax1 = subplot(3,1,1,sharex=ax2)
+ax1.plot(times[xts>0],xts[xts>0],'b')
+ax1.set_title('X-ray MAXI J1820+070 Data')
+# plt.show()
+plt.savefig('overlap_analysis_plots/'+night+'_all_timeseries.pdf')
 
 #######
 print
@@ -160,13 +162,14 @@ def powerspectra(pdkey):
 
     powerspec64 = np.asarray(powerspec64)
     powerspec128 = np.asarray(powerspec128)
-    # print np.shape(powerspec128)
     return freq64,powerspec64, freq128, powerspec128
 
 print "calculating power spectrum for each chunk..."
 freq64, rho_maxij_pspec64, freq128, rho_maxij_pspec128 = powerspectra('rho_maxij_fixed_ts')
 freq64, rho_tycho_pspec64, freq128, rho_tycho_pspec128 = powerspectra('rho_tycho_fixed_ts')
 freq64, xray_maxij_pspec64, freq128, xray_maxij_pspec128 = powerspectra('xray_maxij_fixed_ts')
+
+print np.shape(rho_maxij_pspec128)
 
 rho_maxij_ptot = np.sum(rho_maxij_pspec128, axis=0)
 rho_maxij_ptotnorm = rho_maxij_ptot/(rho_maxij_ptot[0]**0.5)
@@ -182,61 +185,102 @@ xray_maxij_flog,xray_maxij_ptotlog = logbin(freq128,xray_maxij_ptotnorm,0.05)
 
 
 print "plotting sum of power spectra, 128s chunks..."
-# fig2,ax = plt.subplots(facecolor='w')
-# ax3 = subplot(1,1,1)
-# ax3.set_title('Sum over all 128s Power Spectra')
+fig2,ax = plt.subplots(facecolor='w',figsize=[10, 12])
+ax3 = subplot(2,1,1)
+ax3.set_title('Sum over all 128s Power Spectra for ' + night)
 # ax3.plot(10.**rho_maxij_flog[rho_maxij_ptotlog>0.], (10.**rho_maxij_flog[rho_maxij_ptotlog>0.])*rho_maxij_ptotlog[rho_maxij_ptotlog>0.],
 #          '-r',drawstyle='steps-mid',lw=3)
 # ax3.plot(10.**rho_tycho_flog[rho_tycho_ptotlog>0.], (10.**rho_tycho_flog[rho_tycho_ptotlog>0.])*rho_tycho_ptotlog[rho_tycho_ptotlog>0.],
 #          '-k',drawstyle='steps-mid',lw=3,alpha=.5)
-# ax3.plot(10.**xray_maxij_flog[xray_maxij_ptotlog>0.], (10.**xray_maxij_flog[xray_maxij_ptotlog>0.])*xray_maxij_ptotlog[xray_maxij_ptotlog>0.],
-#          '-b',drawstyle='steps-mid',lw=3)
-# ax3.plot(10.**rho_maxij_flog[rho_maxij_ptotlog>0.],(10.**rho_maxij_flog[rho_maxij_ptotlog>0.])*rho_maxij_ptotlog[rho_maxij_ptotlog>0.] - (10.**rho_tycho_flog[rho_tycho_ptotlog>0.])*rho_tycho_ptotlog[rho_tycho_ptotlog>0.],
-#          '-r',drawstyle='steps-mid',lw=3,alpha=.5)
-# ax3.set_xlabel('Frequency (Hz)')
-# ax3.set_ylabel('f x Power')
-# ax3.axvline(x=0.09, c='m', linestyle='--', lw=2)
-# ax3.axvline(x=0.045, c='c', linestyle='--', lw=2)
+ax3.plot(10.**xray_maxij_flog[xray_maxij_ptotlog>0.], (10.**xray_maxij_flog[xray_maxij_ptotlog>0.])*xray_maxij_ptotlog[xray_maxij_ptotlog>0.],
+         '-b',drawstyle='steps-mid',lw=3)
+ax3.plot(10.**rho_maxij_flog[rho_maxij_ptotlog>0.],(10.**rho_maxij_flog[rho_maxij_ptotlog>0.])*rho_maxij_ptotlog[rho_maxij_ptotlog>0.] - (10.**rho_tycho_flog[rho_tycho_ptotlog>0.])*rho_tycho_ptotlog[rho_tycho_ptotlog>0.],
+         '-r',drawstyle='steps-mid',lw=3)
+ax3.set_xlabel('Frequency (Hz)')
+ax3.set_ylabel('f x Power')
+ax3.axvline(x=0.09, c='c', linestyle='--', lw=2)
+ax3.axvline(x=0.045, c='m', linestyle='--', lw=2)
 # ax3.axvline(x=0.0225,color='y',linestyle='--',lw =2)
-# ax3.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
-# ax3.set_xscale('log')
-# ax3.set_xlim(7e-3,0.5)
-# ax3.set_ylim(0,1.5e3)
-# plt.legend(['RHO MaxiJ', 'RHO Tycho', 'NICER MaxiJ', 'RHO MaxiJ-Tycho', '11s' , '22s' , '44s'])
-# # plt.show()
-
+ax3.xaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+ax3.set_xscale('log')
+ax3.set_xlim(7e-3,0.5)
+ax3.set_ylim(0,1.3e3)
+plt.legend([
+            # 'RHO Tycho',
+            'NICER (X-ray) Maxi J1820+070',
+            'RHO (Optical) Maxi J1820+070',
+            # 'RHO MaxiJ-Tycho',
+            '11s' ,
+            '22s' ,
+            # '44s',
+            ],
+          loc='upper center', bbox_to_anchor=(.5, -0.15),
+          fancybox=True, shadow=True, ncol=2)
+# plt.show()
+plt.savefig('overlap_analysis_plots/'+night+'_power_spectra_sum.pdf')
 
 print "creating 2D power spectrum"
 logfreq128, logpsd_rho_maxij128 = p_2_logp(freq128, rho_maxij_pspec128,0.03,4)
 rho_maxij_map128 = np.asarray((10.**logfreq128[:1])*(logpsd_rho_maxij128[:,1:]))
+print len(logfreq128)
+print 10**logfreq128
 
+fig99,ax = plt.subplots(facecolor='w')
+ax.plot(10**logfreq128, np.arange(len(logfreq128)),'.-')
+# ax.plot(np.arange(len(logfreq128)),np.log10())
+plt.savefig('overlap_analysis_plots/testfig.pdf')
+
+print np.shape(rho_maxij_map128)
 print "plotting median-subtracted & cleaned up timeseries"
 time_clean = np.ravel([list(datadict[str(c)]['unix_time']) for c in np.arange(ctot)])
 xray_maxij_clean = np.ravel([list(datadict[str(c)]['xray_maxij_med_ts']) for c in np.arange(ctot)])
 rho_maxij_clean = np.ravel([list(datadict[str(c)]['rho_maxij_med_ts']) for c in np.arange(ctot)])
 rho_tycho_clean = np.ravel([list(datadict[str(c)]['rho_tycho_med_ts']) for c in np.arange(ctot)])
 
-# fig3,ax = plt.subplots(facecolor='w')
-# ax1 = subplot(3,1,1)
-# ax1.plot(time_clean[(time_clean>0) & (xray_maxij_clean!=0)],xray_maxij_clean[(time_clean>0) & (xray_maxij_clean!=0)],'b-')
-#
-# ax2 = subplot(3,1,2)
-# ax2.plot(time_clean[time_clean>0],rho_maxij_clean[time_clean>0],'r-')
-#
-# ax3 = subplot(3,1,3)
-# ax3.imshow(rho_maxij_map128.T, vmax = 40, cmap='magma',interpolation='none', origin='lower')
-# # this one needs a gridspec to look nice though so do that later; add in the colorbar too
-# # plt.show()
+fig3,ax = plt.subplots(facecolor='w')
+
+ax1 = subplot(3,1,1)
+ax1.plot(time_clean[(time_clean>0) & (xray_maxij_clean!=0)],xray_maxij_clean[(time_clean>0) & (xray_maxij_clean!=0)],'b-')
+
+ax2 = subplot(3,1,2)
+ax2.plot(time_clean[time_clean>0],rho_maxij_clean[time_clean>0],'r-')
+
+ax3 = subplot(3,1,3)
+ax3.imshow(rho_maxij_map128.T, vmax = 40, cmap='magma',interpolation='none', origin='lower')
+# this one needs a gridspec to look nice though so do that later; add in the colorbar too
+# plt.show()
 
 
-# fig4,ax=plt.subplots(figsize=(6,8), facecolor='w')
-# plt.imshow(rho_maxij_map128, vmax = 40, cmap='magma',interpolation='none')
-# # plt.plot([4.1,4.1],[0,86],c='r',linestyle='--')
-# # ax.plot([10.25,10.25],[0,86],c='r',linestyle='--')
-# ax.set_title('RHO MAXI J1820+070 - 28 Mar 2018')
-#
+fig4=plt.figure(figsize=(6,12), facecolor='w')
+fig4.suptitle('RHO Optical MAXI J1820+070\n 2D Power Spectrum (128s) \n' + night, fontsize=16)
+
+grd = gridspec.GridSpec(1,2, wspace = .25, hspace = 0.0, width_ratios=(10, 1))
+
+
+ax2 = fig4.add_subplot(grd[0,0])
+# ax2.set_axis_off()
+im = ax2.imshow(rho_maxij_map128, vmax = 40, cmap='magma',interpolation='none', extent = [10**logfreq128[0],10**logfreq128[-1],1,0])
+ax2.autoscale(False)
+# ax2.set_xscale('log', basex=10)
+# ax2.set_xticks([.01, .1])
+# ax2.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+ax2.get_xaxis().set_tick_params(which='both',direction='out', width=1)
+
+# ax1 = ax2.twiny()
+ax2.axvline(x=10**np.log10(0.09), c='c', linestyle='--', lw=2)
+ax2.axvline(x=10**np.log10(0.045), c='r', linestyle='--', lw=2)
+# ax1.autoscale(False)
+
+cbar_ax = fig4.add_subplot(grd[0,1])
+plt.colorbar(im,cbar_ax);
+# plt.plot([4.1,4.1],[0,86],c='r',linestyle='--')
+# ax.plot([10.25,10.25],[0,86],c='r',linestyle='--')
+# ax.set_title('RHO MAXI J1820+070 - ' +night, y=1.015)
 # plt.colorbar()
-# # plt.show()
+
+
+# plt.show()
+plt.savefig('overlap_analysis_plots/'+night+'_2d_powerspectrum.pdf')
 
 #######
 print
@@ -353,18 +397,19 @@ ochunk_kfix = np.setdiff1d(ochunk_keys,deletethese)
 # plot of time series over chunk of data
 ctot = len(ochunk_kfix)
 
-# fig6,ax1=plt.subplots(figsize=[6,10],facecolor='w')
-# subplots_adjust(hspace=0.000)
-# for c,v in zip(ochunk_kfix,xrange(ctot)):
-#     ch = str(c)
-#     v = v+1
-#     ax1 = subplot(ctot,1,v)
-#     ax1.plot(tc, ochunk_datadict[ch]['xray_maxij_med_ts'],'.-b')
-#     ax1.plot(tc, ochunk_datadict[ch]['rho_maxij_med_ts'],'.-r')
-#     # ax1.plot(tc, ochunk_datadict[ch]['rho_tycho_med_ts'],'.-k',alpha=.3)
-#     ax1.plot([0,ntot],[0,0],'k')
-#     ax1.set_xlim(0,ntot)
-# ax1.legend(['MaxiJ@Nicer','MaxiJ@RHO',"Tycho@RHO"])
+fig6,ax1=plt.subplots(figsize=[6,10],facecolor='w')
+subplots_adjust(hspace=0.000)
+for c,v in zip(ochunk_kfix,xrange(ctot)):
+    ch = str(c)
+    v = v+1
+    ax1 = subplot(ctot,1,v)
+    ax1.plot(tc, ochunk_datadict[ch]['xray_maxij_med_ts'],'.-b')
+    ax1.plot(tc, ochunk_datadict[ch]['rho_maxij_med_ts'],'.-r')
+    # ax1.plot(tc, ochunk_datadict[ch]['rho_tycho_med_ts'],'.-k',alpha=.3)
+    ax1.plot([0,ntot],[0,0],'k')
+    ax1.set_xlim(0,ntot)
+ax1.legend(['MaxiJ@Nicer','MaxiJ@RHO',"Tycho@RHO"])
+plt.savefig('overlap_analysis_plots/'+night+'_time_series_median_chunks.pdf')
 
 #######
 print
@@ -453,51 +498,53 @@ for c in ochunk_kfix:
 print
 print "plotting CCFs..."
 
-# fig7,ax=plt.subplots(figsize=[20,12],facecolor='w')
-# subplots_adjust(hspace=0.0000)
-# subplots_adjust(wspace=0.075000)
-# ctot = len(ochunk_kfix)
-# # fig7.tight_layout()
-# fig7.subplots_adjust(top=.95)
-# fig7.suptitle('CCFs of all overlapping chunks of 64-second data',fontsize=16)
-#
-# for c,v in zip(ochunk_kfix,xrange(ctot)):
-#     v = v+1
-#     ax = subplot(np.ceil(ctot/2)+1,2,v)
-#     ch = str(c)
-#     ax.plot(overlapdict_med[ch]['ccf_xray_rho_maxij'], 'g', linewidth=2)
-#     ax.plot(overlapdict_med[ch]['ccf_xray_maxij_rho_tycho_control'], 'c', linewidth=2)
-#     ax.axvline(x=ntot/2.,color='y',alpha=.7)
-#     ax.axhline(y=0,color='k')
-#     titletime = ochunk_datadict[ch]['unix_time'][0]
-#     ax.set_title(datetime.utcfromtimestamp(titletime).strftime('%Y-%m-%d %H:%M:%S') + " UTC", x=.83, y=0)
-#     ax.set_xlim(0,ntot)
-# #     ax.set_xlim(20,40)
-#
-# ax.legend(['MaxiJ@Nicer/MaxiJ@RHO',
-#            'MaxiJ@Nicer/Tycho@RHO'],
-#          loc='upper center', bbox_to_anchor=(0.5, -0.2),
-#           fancybox=True, shadow=True, ncol=3)
+fig7,ax=plt.subplots(figsize=[20,12],facecolor='w')
+subplots_adjust(hspace=0.0000)
+subplots_adjust(wspace=0.075000)
+ctot = len(ochunk_kfix)
+# fig7.tight_layout()
+fig7.subplots_adjust(top=.95)
+fig7.suptitle('CCFs of all overlapping chunks of 64-second data',fontsize=16)
+
+for c,v in zip(ochunk_kfix,xrange(ctot)):
+    v = v+1
+    ax = subplot(np.ceil(ctot/2)+1,2,v)
+    ch = str(c)
+    ax.plot(overlapdict_med[ch]['ccf_xray_rho_maxij'], 'g', linewidth=2)
+    ax.plot(overlapdict_med[ch]['ccf_xray_maxij_rho_tycho_control'], 'c', linewidth=2)
+    ax.axvline(x=ntot/2.,color='y',alpha=.7)
+    ax.axhline(y=0,color='k')
+    titletime = ochunk_datadict[ch]['unix_time'][0]
+    ax.set_title(datetime.utcfromtimestamp(titletime).strftime('%Y-%m-%d %H:%M:%S') + " UTC", x=.83, y=0)
+    ax.set_xlim(0,ntot)
+#     ax.set_xlim(20,40)
+
+ax.legend(['MaxiJ@Nicer/MaxiJ@RHO',
+           'MaxiJ@Nicer/Tycho@RHO'],
+         loc='upper center', bbox_to_anchor=(0.5, -0.2),
+          fancybox=True, shadow=True, ncol=3)
+
+plt.savefig('overlap_analysis_plots/'+night+'_overlap_CCFs.pdf')
 
 print "plotting mean of all CCFs..."
 # mean of all (good) CCFs
-#
-# fig8,ax=plt.subplots(figsize=[10,8],facecolor='w')
-#
-# ax.plot(xrange(-32,32),np.mean([ccf_xray_rho_maxij[str(c)] for c in ochunk_kfix],axis=0),'g', lw=2)
-# ax.plot(xrange(-32,32),np.mean([ccf_xray_maxij_rho_tycho_control[str(c)] for c in ochunk_kfix],axis=0),'k',alpha=.8,lw = 2)
-# ax.axvline(x=0,color='r',lw = 2)
-# ax.axhline(y=0,color='k')
-# ax.legend(['NICER BH : RHO BH','NICER BH : Reference Star (Noise)'],
-#          loc='upper center', bbox_to_anchor=(0.5, -0.1),
-#           fancybox=True, shadow=True, ncol=1, fontsize=20)
-#
-# ax.set_title("mean ccf of x-ray to optical in a bunch of one-minute data segments")
-# ax.set_xlim(-32,32)
-# ax.tick_params(axis='both', which='major', labelsize=16)
-# ax.set_xlabel('Seconds',fontsize=16)
-# ax.set_ylabel('Amplitude',fontsize=16)
 
+fig8,ax=plt.subplots(figsize=[10,8],facecolor='w')
+
+ax.plot(xrange(-32,32),np.mean([ccf_xray_rho_maxij[str(c)] for c in ochunk_kfix],axis=0),'g', lw=2)
+ax.plot(xrange(-32,32),np.mean([ccf_xray_maxij_rho_tycho_control[str(c)] for c in ochunk_kfix],axis=0),'k',alpha=.8,lw = 2)
+ax.axvline(x=0,color='r',lw = 2)
+ax.axhline(y=0,color='k')
+ax.legend(['NICER BH : RHO BH','NICER BH : Reference Star (Noise)'],
+         loc='upper center', bbox_to_anchor=(0.5, -0.1),
+          fancybox=True, shadow=True, ncol=1, fontsize=20)
+
+ax.set_title("mean ccf of x-ray to optical in a bunch of one-minute data segments")
+ax.set_xlim(-32,32)
+ax.tick_params(axis='both', which='major', labelsize=16)
+ax.set_xlabel('Seconds',fontsize=16)
+ax.set_ylabel('Amplitude',fontsize=16)
+plt.savefig('overlap_analysis_plots/'+night+'_mean_all_CCFs.pdf')
 
 xray_maxij_ts = {}
 rho_maxij_ts = {}
@@ -533,24 +580,31 @@ ch = str(ochunk_kfix[5])
 nel2=len(datadict2[ch]['fft_xray_maxij'])/2
 f = np.arange(nel2)/64.
 
-fig10,ax=plt.subplots(figsize=[5,15],facecolor='w')
+fig10,ax=plt.subplots(figsize=[6,15],facecolor='w')
 subplots_adjust(hspace=0.0000)
 ctot = len(ochunk_kfix)
-fig10.tight_layout()
-fig10.subplots_adjust(top=.95)
-fig10.suptitle('FFTs of all overlapping chunks of 64-second data',fontsize=16)
-
+# fig10.tight_layout()
+# fig10.subplots_adjust(top=.5)
+fig10.suptitle('Power Spectra - Maxi J1820+070 \n (64s each, ' + night + ')', fontsize=16)
 for c,v in zip(ochunk_kfix,xrange(ctot)):
     v = v+1
-    ax = subplot(ctot,1,v)
+    ax = subplot(ctot+1,1,v)
     ch = str(c)
     ax.plot(f,np.abs(((datadict2[ch]['fft_xray_maxij'][:nel2]))**2)/np.abs(((datadict2[ch]['fft_xray_maxij'][:nel2]))**2)[0],'b-', lw=2, drawstyle='steps-mid') #xray maxij
     ax.plot(f,10*np.abs(((datadict2[ch]['fft_rho_maxij'][:nel2]))**2)/np.abs(((datadict2[ch]['fft_rho_maxij'][:nel2]))**2)[0],'r-', lw=2, drawstyle='steps-mid') #optical maxij
     # ax.plot(f,10*np.abs(((datadict2[ch]['fft_rho_tycho'][:nel2]))**2)/np.abs(((datadict2[ch]['fft_rho_tycho'][:nel2]))**2)[0],'g.-', drawstyle='steps-mid') #tycho
-    ax.axvline(x=ntot/2.,color='y',alpha=.7)
-    ax.axhline(y=0,color='k')
+    # ax.axvline(x=ntot/2.,color='y',alpha=.7)
+    # ax.axhline(y=0,color='k')
     ax.axvline(x=0.09, c='k', linestyle='--', lw=2)
     ax.axvline(x=0.045, c='k', linestyle='--', lw=2)
+
+    ax.get_yaxis().set_ticks([])
+    if c != np.max(ochunk_kfix):
+        ax.get_xaxis().set_ticks([])
+
+    titletime = ochunk_datadict[ch]['unix_time'][0]
+    ax.set_title(datetime.utcfromtimestamp(titletime).strftime('%Y-%m-%d %H:%M:%S') + " UTC", x=.6, y=.5)
+
 # ax.plot(crosscorr_xo - crosscorr_xt,'k')
 # ax.plot(auto_o/4,'r')
 # ax.plot(auto_x,'b')
@@ -559,32 +613,34 @@ for c,v in zip(ochunk_kfix,xrange(ctot)):
     ax.set_ylim(0,.01)
 #     ax.set_xlim(0,ntot)
     ax.set_xlim(0,.5)
-
+ax.set_xlabel('Frequency (Hz)')
+ax.set_ylabel('Normalized Power', y=6)
 # ax.set_title('Optical+X-ray Correlation (one chunk of 128-second overlapping data) 51.5s lead')
 ax.legend(['MaxiJ@Nicer',
            'MaxiJ@Nicer',
-           'Tycho@RHO',
+           'Previously Identified QPOs'
+           # 'Tycho@RHO',
            # 'RHO Optical Auto-correlation',
            # 'Nicer X-ray Auto-correlation',
            # 'RHO Tycho Reference Auto-correlation',
 #            'Autocorrelation Peak'
           ],
-         loc='upper center', bbox_to_anchor=(0.5, -0.05),
-          fancybox=True, shadow=True, ncol=3)
-
+         loc='upper center', bbox_to_anchor=(.5, -0.6),
+          fancybox=True, shadow=True, ncol=1)
+plt.savefig('overlap_analysis_plots/' + night + '_fft_overlaps.pdf')
 # print np.argmax(crosscorr_xo)
 
 
-fig11, ax = plt.subplots(figsize=[5, 15], facecolor='w')
+fig11, ax = plt.subplots(figsize=[6, 15], facecolor='w')
 subplots_adjust(hspace=0.0000)
 ctot = len(ochunk_kfix)
-fig11.tight_layout()
-fig11.subplots_adjust(top=.95)
-fig11.suptitle('Crosspower Spectra - Maxi J1820+070 \n (64s each, 28 Mar 2018)', fontsize=16)
+# fig11.tight_layout()
+# fig11.subplots_adjust(top=.95)
+fig11.suptitle('Crosspower Spectra - Maxi J1820+070 \n (64s each, ' + night + ')', fontsize=16)
 
 for c, v in zip(ochunk_kfix, xrange(ctot)):
     v = v + 1
-    ax = subplot(ctot, 1, v)
+    ax = subplot(ctot+1, 1, v)
     ch = str(c)
 
     xps = np.abs((datadict2[ch]['fft_xray_maxij'][:nel2] * np.conj(datadict2[ch]['fft_rho_maxij'][:nel2]))) / \
@@ -595,8 +651,8 @@ for c, v in zip(ochunk_kfix, xrange(ctot)):
     ax.plot(f[f > 0], xps[f > 0], 'g-', drawstyle='steps-mid', lw=3)
     ax.plot(f[f > 0], tycho_xps[f > 0], '-k', drawstyle='steps-mid', alpha=.5, lw=3)
     # ax.axvline(x=0.0225,color='y',linestyle='--')
-    ax.axvline(x=0.09, c='r', linestyle='--', lw=2)
-    ax.axvline(x=0.045, c='r', linestyle='--', lw=2)
+    ax.axvline(x=0.09, c='k', linestyle='--', lw=2)
+    ax.axvline(x=0.045, c='k', linestyle='--', lw=2)
     # ax.axvline(x=0.18,color='y',linestyle='--')
 
     ax.set_ylim(0, .002)
@@ -608,14 +664,17 @@ for c, v in zip(ochunk_kfix, xrange(ctot)):
     titletime = ochunk_datadict[ch]['unix_time'][0]
     ax.set_title(datetime.utcfromtimestamp(titletime).strftime('%Y-%m-%d %H:%M:%S') + " UTC", x=.6, y=.5)
 
+
 ax.legend(['Maxi J1820+070 X-ray:Optical', 'Maxi J1820+070 X-ray:Reference Star Optical', 'Previously Identified QPOs'],
-          loc='upper center', bbox_to_anchor=(0.5, -0.4),
+          loc='upper center', bbox_to_anchor=(.5, -0.6),
           fancybox=True, shadow=True, ncol=1)
+
 
 ax.set_xlabel('Frequency (Hz)')
 ax.set_ylabel('Normalized Power', y=6)
+plt.savefig('overlap_analysis_plots/' + night + '_crosspower_spectra.pdf')
 
 #######
 print
 print timefinish(time0)
-plt.show()
+# plt.show()
